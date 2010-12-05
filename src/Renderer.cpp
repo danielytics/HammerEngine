@@ -19,10 +19,8 @@ Renderer::~Renderer ()
 
 void Renderer::init (unsigned int width, unsigned int height, bool fullscreen, bool vsync)
 {
-    if (inited)
-    {
-        term();
-    }
+    // Make sure there is no existing window, opengl context or SDL system running
+    term();
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -42,7 +40,7 @@ void Renderer::init (unsigned int width, unsigned int height, bool fullscreen, b
     {
         flags |= SDL_WINDOW_FULLSCREEN;
     }
-    // Create our window centered at 512x512 resolution
+    // Create the window
     window = SDL_CreateWindow(gameName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
     if (!window)
     {
@@ -67,41 +65,55 @@ void Renderer::init (unsigned int width, unsigned int height, bool fullscreen, b
 
 void Renderer::term ()
 {
-    // Terminate OpenGL
-    if (context)
+    if (inited)
     {
-        SDL_GL_DeleteContext(context);
+        // Terminate OpenGL
+        if (context)
+        {
+            SDL_GL_DeleteContext(context);
+        }
+        // Close the window
+        if (window)
+        {
+            SDL_DestroyWindow(window);
+        }
+        // Terminate SDL
+        SDL_Quit();
+        inited = false;
     }
-    // Close the window
-    if (window)
-    {
-        SDL_DestroyWindow(window);
-    }
-    // Terminate SDL
-    SDL_Quit();
-    inited = false;
 }
+
+bool flag = false;
+int state = 0;
 
 void Renderer::render ()
 {
     unsigned int diff = SDL_GetTicks() - startTime;
-    if (diff < 2000)
+
+    if (!flag)
     {
-        glClearColor ( 1.0, 1.0, 0.0, 1.0 );
+        if (state == 0)
+        {
+            glClearColor ( 1.0, 1.0, 0.0, 1.0 );
+        }
+        else if (state == 1)
+        {
+            glClearColor ( 0.0, 1.0, 0.0, 1.0 );
+        }
+        else if (state == 2)
+        {
+            glClearColor ( 0.0, 0.0, 1.0, 1.0 );
+        }
+        glClear ( GL_COLOR_BUFFER_BIT );
+        SDL_GL_SwapWindow(window);
+
+        flag = true;
     }
-    else if (diff < 4000)
+    if (diff >= 2000)
     {
-        glClearColor ( 0.0, 1.0, 0.0, 1.0 );
-    }
-    else if (diff < 6000)
-    {
-        glClearColor ( 0.0, 0.0, 1.0, 1.0 );
-    }
-    else
-    {
+        flag = false;
+        state++;
+        state = state > 2 ? 0 : state;
         startTime = SDL_GetTicks();
     }
-
-    glClear ( GL_COLOR_BUFFER_BIT );
-    SDL_GL_SwapWindow(window);
 }

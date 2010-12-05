@@ -1,8 +1,9 @@
 
 #include "Renderer.h"
 
-
 #include <iostream>
+
+#define FRAMERATE_COUNTER_LATENCY 500
 
 int logicThread (void* data)
 {
@@ -25,6 +26,7 @@ int logicThread (void* data)
          sends it to the graphics card for drawing. We want to do as much of the CPU-bound rendering work as possible here so that
          it can be parallelized. The renderer thread should then simply walk the sorted render list and send commands to the GPU.
          */
+        SDL_Delay(250);
     }
 
     return 0;
@@ -40,8 +42,17 @@ int main (int argc, char** argv)
     SDL_Event event;
     bool running = true; // Local running flag to avoid hitting the core interconnect every frame
 
+    unsigned int frameTimer;
+    unsigned int elapsedTime;
+    unsigned int frames = 0;
+    float framerate = 0;
+    float total = 0;
+    unsigned int numFrames = 0;
+
     try {
-        renderer.init(512, 512, false);
+        //renderer.init(512, 512, false);
+        renderer.init(1024, 768, true);
+        frameTimer = SDL_GetTicks();
 
         // Run input/rendering loop
         while (running)
@@ -67,9 +78,10 @@ int main (int argc, char** argv)
                     // Key was released
                     break;
                 case SDL_WINDOWEVENT:
-                    // Window close butten pressed
+                    // Window event received
                     {
                         if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+                        // Window close butten pressed
                         {
                             running = false;
                         }
@@ -80,6 +92,18 @@ int main (int argc, char** argv)
                 }
             }
             renderer.render();
+
+            // Calculate frame rate (number of "frames" rendered to the screen per second; game logic runs unsynchronized with the renderer)
+            ++frames;
+            elapsedTime = SDL_GetTicks() - frameTimer;
+            if (elapsedTime > FRAMERATE_COUNTER_LATENCY)
+            {
+                framerate = (float)(1000 / elapsedTime) * (float)(frames);
+                frames = 0;
+                total += framerate;
+                numFrames++;
+                frameTimer = SDL_GetTicks();
+            }
         }
     }
     catch (const std::string& error)
@@ -91,6 +115,8 @@ int main (int argc, char** argv)
     threadRunning  = false; // Share running flag accross interconnect to other thread
     int status;
     SDL_WaitThread(logic, &status);
+
+    std::cout << "Average framerate: " << total << " " << numFrames << " = " << (total / numFrames) << "\n";
 
     return 0;
 }

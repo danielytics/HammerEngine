@@ -11,7 +11,7 @@ class Renderer
 {
 private:
     bool inited;
-    std::string gameName;
+    const std::string gameName;
     SDL_WindowID window;
     SDL_GLContext context;
 
