@@ -1,0 +1,33 @@
+
+/*
+ * Objects:
+ *
+ * Image		A drawable image, engine defined
+ * Tile			Engine-backed background image object, scripts may define Tile classes with additional properties
+ * TileMap		A grid of Tile objects, engine defined
+ * Viewport		A camera view into a tile map, egnine defined
+ * Sprite		An animated set of images, engine defined
+ * Actor		Script defined extension to Sprite allowing script control (eg, physics, AI) of the Sprite
+ * Controller	An engine defined interface for controlling Actors
+ * Player		Script defined Controller allowing user actions to control Actors
+ *
+ */
+
+/* Define Tile properties */
+class Tile (walkable)
+	solid = !walkable
+
+	init
+		/* Let the game engine know about the newly instanciated tile */
+		TileSystem.add(self)
+	end
+end
+
+
+class Player (player)
+	actor = player
+
+	init
+	end
+
+end

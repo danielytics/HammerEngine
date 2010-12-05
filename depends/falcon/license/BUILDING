@@ -1,0 +1,148 @@
+
+
+                     The Falcon Programming Language
+
+                                0.9.6.6
+                                
+                          BUILDING INSTRUCTION
+
+
+INTRODUCTION
+============
+
+  This document refers to building Falcon source package as it distributed
+in bleeding edge and official releases.
+
+  To configure a more complete development enviroment, where it is possible
+to have different versions of Falcon compiled with different settings and
+having a different set of modules compiled and installed for each setting,
+please refer to the following on-line document:
+
+   http://falconpl.org/?s=bf
+
+PRE-REQUISITE
+=============
+
+  To build Falcon, it is necessary to have installed a recent version of a
+c/c++ compiler supporting your platform and cmake, available at
+
+   http://www.cmake.org
+
+  Other than that, it is optionally required to provide development files
+correctly installed and configured for the following well known libraries:
+
+  - ZLIB
+  - PCRE
+
+
+THE BUILD PROCESS
+=================
+
+  The build process happens under a standard CMAKE build session. Most of the
+times,
+
+  mkdir build
+  cd build
+  cmake ..       (*)
+  make
+  make install
+
+  is enough to create the core Falcon installation. A complete build requires
+also the feathers to be specified in the CMAKE main command line (the line
+indicated by *).
+
+   cmake .. -DFALCON_WITH_FEATHERS=<location to feathers>
+
+  The standard feathers location in the source package is under /feathers.
+
+  Relevant variables affecting the outcome of the build and installation processes
+are:
+
+  - CMAKE_INSTALL_PREFIX: where Falcon will be placed on target systems. It is
+      very relevant in POSIX systems. Defaults to "/usr/local".
+  - FALCON_BIN_DIR: Directory under prefix for binary installation. Defaults
+      to "bin".
+  - FALCON_INC_DIR: Where to store include files. Defaults to
+      "include/falcon<ver>"
+  - FALCON_LIB_DIR: Where to store library files. Defaults to "lib".
+  - FALCON_MOD_DIR: Default location for installation modules. Defaults to
+      "$FALCON_LIB_DIR/falcon" on POSIX system, and "bin" on others.
+  - FALCON_WITH_MANPAGES: Creates and install also manual pages for POSIX
+      man command. It's "ON" by default on POSIX systems, "OFF" on others.
+  - FALCON_MAN_DIR: Where to install man pages. Defaults to "share/man/man1".
+  - FALCON_CMAKE_DIR: Where to install cmake configuration settings that can
+      be used to create third party Falcon modules or application embedding
+      falcon.
+  - FALCON_SHARE_DIR: Where README and other distribution related
+      documentation files are to be placed.
+
+  The "make install" step can be directed to place Falcon in a temporary
+empty location where it will be picked for separate packaging via the default
+"DESTDIR=" setting:
+
+   cmake -DCMAKE_INSTALL_PREFIX="/opt/falcon"
+   make insatll DESTDIR="/tmp/falcon"
+
+  This will move the needed files in /tmp/falcon, but will internally configure
+falcon to run from /opt/falcon/bin
+
+
+*NOTE: You'll usually want to ship your Falcon version built with
+
+        -DCMAKE_BUILD_TYPE=Release
+
+*NOTE: For your comfort, the source distro comes with a cmake_build.sample
+containing all the options set to their default values.
+
+
+Changing library directory name
+===============================
+
+  In some systems, common system libraries for different architectures are
+stored on different directories. For example, one may want to store the 64 bit
+version of Falcon engine in lib64.
+
+
+Internal libraries
+==================
+
+  By default, Falcon feathers build process tries to find in the system a
+build support for PCRE and ZLIB, falling back to build internally shipped
+versions if they are not found:
+
+  - PCRE 7.2
+  - ZLIB 1.1
+
+  To change this behavior, use the following options
+
+  -DFALCON_WITH_INTERNAL_PCRE=ON    (to build internal PCRE)
+  -DFALCON_WITH_INTERNAL_PCRE=OFF   (to force external PCRE)
+  -DFALCON_WITH_INTERNAL_ZLIB=ON    (to build internal ZLIB)
+  -DFALCON_WITH_INTERNAL_ZLIB=OFF   (to force external ZLIB)
+
+
+Support for EDITLINE in interactive mode (POSIX)
+================================================
+
+  The falcon command line tool can take benefit of an installed editline
+library, or use the internally distributed editline in case editline
+is not available.
+
+  Currently, both those library cannot interpret international
+characters correctly, so they are turned off by default.
+
+  To compile falcon with Editline support use:
+
+   -DFALCON_WITH_EDITLINE=ON
+   
+  If you want to use a system-wide installation of editline, instead of
+the one that is shipped with Falcon, use the following option:
+
+   -DFALCON_WITH_INTERNAL_EDITLINE=OFF
+
+  Notice that, in this case, Falcon build system will detect if you
+have a system-wide installation of the edit-line library, and
+use that instead.
+
+  Notice that WIN32 console has a built-in interface that allows to
+edit the commands inputed in the interactive mode.

@@ -1,0 +1,3 @@
+src/debug
+src/release
+depends/SDL-1.3.0/build

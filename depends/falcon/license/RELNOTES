@@ -1,0 +1,59 @@
+
+                         RELEASE NOTES for Falcon
+
+                              Chimera Release
+
+                                  0.9.6.6
+  
+  "Chimera" version is an intermediate version that bridges Eagle series
+with the next series, in which we should put in the final compiler/module
+assets.
+
+  This is the last bugfix release in the Chimera version, and closes the
+series of 0.9.6.6 releases.
+
+  IMPORANT DISCLAIMER: starting from this version, we're introducing the
+mersenne twister algorithm for random number generation. The permission
+to use it has been granted by one of the authors, as described in the
+README.mersenne file.
+
+
+New Features
+============
+
+  - The hash module has been added to feathers; it provides a set of popular
+    hashing facilities as MD5, SHA256, HMAC and many more.
+  - Message oriented programming has now an "event model" message generation,
+    which is added to VMSlot class.
+  - Added method Dictionary.dop (default operation) -- a facility that makes
+    easier to create maps of complex items (i.e. maps of lists) with a one-liner.
+  - Added methods Dictionary.do and Array.concat
+  - Added Base64 class.
+  - New epoch() function returning exactly the seconds since UNIX epoch.
+
+Critical bug fixes
+==================
+
+  - toString() crashed when called without a parameter.
+  - Failing to init the frame in new VMContexts would have caused random
+    crashes depending on linkage or memory conditions.
+  - Immediate array unpack was causing an assert in case of wrong sizes.
+  - passvp() was failing if calling function had local vars
+  
+Usage tips
+==========
+
+   Although the new Garbage Collector is relatively efficient in determining
+the actual needs of applications and in reclaiming unused memory, the standard
+detection algorithms are still a bit naive.
+
+  If your application is memory-intensive, be sure to read the Core Module
+Documentation about the new GC object, which provides four default collection
+strategies and also allows you to implement your own. A finely tuned GC 
+strategy can boost the performance of your application and reduce its memory 
+footprint.
+
+  Meanwhile we'll continue to work towards finding collection strategies 
+applicable to the most common usage patterns and you're invited to provide 
+your own, should this aspect of Falcon be critical to your application.
+

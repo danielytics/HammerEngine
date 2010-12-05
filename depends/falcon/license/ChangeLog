@@ -1,0 +1,950 @@
+Falcon (0.9.6.6)
+  * fixed: Default CoreObject clone didn't try to clone the falcon-data even
+           if it was possible to do that.
+  * fixed: When importing from namespaces, inheritance (derivedFrom) from 
+           classes coming from namespaces wasn't correctly detected.
+  * fixed: In interactive mode (and whenever using the interactive compiler)
+           modules with symbols already known in the VM couldn't be loaded
+           even if stored in their own namespace.
+  * fixed: CoreSlot wasn't exported so it couldn't be used in modules.
+  * fixed: "a" * 10000 taking ages because of parser error in first allocation.
+           Thanks maxm for this.
+  * minor: Added option "-s" in CLT to send error output on stdout, and --cgi
+           option to load "cgi" module and add -s option in one step.
+  * minor: strSplit() returns an array containing all the elements if the token
+           is not given.
+  * fixed: toString() crashed when called without a parameter.
+  * fixed: include() didn't take the engine encodings as the default.
+  * fixed: language level second() was not using the new system independent api 
+           Falcon::Sys::_seconds(). As a result, some embeddings using _second()
+           may have provided mismatched timings on windows.
+  * minor: When used with invalid parameters, falpack points out that -h will 
+           print help text.
+  * fixed: Sys::fal_mkdir (unix) didn't handle absolute paths proper. 
+  * added: Method Dictionary.dop (default operation).
+  * fixed: falpack wasn't correctly storing the plugins in the app subtree.
+  * fixed: Immediate array unpack was causing an assert in case of wrong sizes.
+  * added: Module cache acting directly in ModuleLoader. Should be reviewed for
+           finer control in next version.
+  * added: Methods Dictionary.do and Array.concat
+  * fixed: passvp() was failing if calling function had local vars (!)
+  * fixed: First trace step of errors didn't report the target file name.
+  * fixed: import <module> in <namespace> used the "as" instead of "in" keyword.
+  * added: Base64 class.
+  * fixed: String.escape() enscaped only below chr(8) and not below chr(32).
+  * added: epoch() function returning exactly the seconds since UNIX epoch.
+  * fixed: Comparation with timestamps and other kind of items caused an
+           endless recursion.
+  * fixed: strSplit(":",":") should logically return an array of two empty items,
+           but returned ":" instead.
+
+Falcon (0.9.6.4)
+  * fixed: returning oob(1) from a filter in comp() & single sequence mfcomp
+           didn't discard the value.
+  * fixed: Path::uriToWin() (used to post-normalize paths on MS-Windows system)
+           didn't translate '+' into ' ', which meant troubles with filenames
+           including spaces on MS-Windows.
+  * fixed: falpack used the user-provided main script path as-is, without prior
+           normalization, causing all the scripts to be considered 
+           non-applciation (system) when the path was given in non-canonical
+           format.
+  * minor: Asynchronous messages are now handled more smoothly.
+  * fixed: future binding (named parameters) "invaded" local variables in target 
+           function symbol table. 
+  * fixed: strSplitTrimmed (and FBOM.splittr) put an extra empty string at the end
+           of the array when multiple separators was at the end of the parsed
+           input strings.
+  * fixed: Failing to init the frame in new VMContexts would have caused random
+           crashes depending on linkage or memory conditions (thanks Mordae).
+  * added: Function.trace() to get the traceback steps.
+  * fixed: Invalid loop condition caused fself.caller() to segfault (all
+           thanks to fgenesis).
+  * fixed: Fordot statement (.=) couldn't be used after for/in...: (after a colon)
+  * added: Methodic functions strEsq, strUnesq, strEscape, strUnescape (and 
+           similarly named methods in String) helping string transformation in
+           web modules.
+  * fixed: URI::URLEscape needed much more escaping...
+  * fixed: Error reporting in include() may crash.
+  * fixed: def statement crashed if declared variables was not assigned.
+  * fixed: Directory.descend can be called with nil as directory handler function.
+  * fixed: URI::URLDecode was a bit too strict; there's no need to filter chars
+           under 0x20.
+  * added: Event model to VMSlot (children named slots). 
+  * fixed: StreamBuffer may cause hangs on partial reads in net-based streams.
+  * fixed: clone() and *comp() didn't duplicate strings as semantic would suggest.
+  * added: Now unknown messages are optionally marshalled to "__on_event" in objects.
+
+Falcon (0.9.6.2)
+  * fixed: Random crash on runtime errors during object init.
+  * fixed: fileExt() returned the file part since first dot.
+  * added: Support for OEM - IBM473 code page.
+  * fixed: fileType() and FileStat return values were not initialized, cusing
+           weird values in case of file not found errors.
+  * added: First version of falpack.
+  * fixed: Error in class symbol de-serialization caused failure of fam
+           loading. The default fallback to .fal re-compilation hid the
+           problem.
+  * fixed: In c++ API, Path::getWindowsFormat went in endless loop.
+  * added: Path.fulloc, Path.winpath, Path.winloc and Path.winfulloc properties
+           to the Path class.
+  * added: falpack CLT tool.
+  * fixed: Module loader now takes into account also disk specifiers.
+  * fixed: Path::isAbsolute wasn't considering relative paths under disk 
+           specificators.
+  * fixed: Local symbol tables of functions may have been broken, causing
+           string expansion and other language elements in need of dynamic
+           access to local symbol table to break.
+  * added: mcomp and mfcomp methods to sequences for multiple comprehension.
+  * fixed: Comprehension support is now not atomic (and supports 
+           continuations).
+  * fixed: Continuation.clone wasn't correctly working -- currently disabled
+           because causes segfaults.
+  * major: "state" keyword removed. Now, states are declared with [statename] 
+  * fixed: Asynchronous message processing was basically broken, but the breakage
+           could be spotted only at random conditions.
+  * fixed: Addressing issue on sparc64 caused segfault on __leave handling in
+           state transitions.
+  * fixed: the check on VMContext::preParam was totally bogus and
+           may have caused to return 0 even if proper pre-parameter existed.
+  
+Falcon (0.9.6)
+  * minor: On windows, stream functions now accept paths also in windows 
+           format. This is controlled by an engine global setting that
+           is ON by default on windows and OFF elsewhere.
+  * fixed: Throws to manage return frames was a bit excessive. This
+           wasted lots of time in atomic calls.
+  * fixed: Timestamp.dayOfWeek() wasn't working correctly.
+  * fixed: Extra error field was always set to "_init" when raised during
+           the link process in VM.
+  * minor: Using libedit on unix for a more handy interactive mode.
+  * fixed: Items generated in interactive mode may have been randomly ripped
+           by the GC.
+  * fixed: Calling an item referencing a callable item wasn't working.
+  * major: overrides are PREFIXED by __, and not suffixed anymore.
+  * fixed: Deserialization of objects didn't dereference the class item;
+           classes coming from remote modules would crash.
+  * major: Added states in classes. Now "state" is a keyword.
+  * minor: Added fileExt() and fileUnit() functions for completeness.
+  * fixed: Immediate circular dependencies in inheritance lists caused
+           endless loop in VMachine::link
+  * fixed: Errors in the expression part of for/in statements may have caused 
+           the compiler to lose track of context levels. This caused segfaults
+           on some statements nearby those erroneous for/in decls.
+  * fixed: for-to construct failed to enter the loop in 0 to 0. Also it didn't
+           loop the correct times when starting and ending in negative ranges.
+  * fixed: EOF in ReadFile (windows streams) was not always correctly detected.
+  * fixed: Read of multi-byte filenames on POSIX systems caused double-utf8 
+           encoding.
+  * major: Added Continuation class, allowing to suspend & resume arbitrary code.
+  * major: Added unbound variables, created with the "_" symbol, as a new 
+           "UnboundType" with relative metaclass and item type.
+  * fixed: Garbage collection during link steps (i.e. on sub-module main(), and
+           in instance initialization) would cause a safe crash, as it would
+           destroy the LiveModules that are in the runtime, but not yet linked.
+           Pitifully, this fix is useless, as LiveModules are to be removed in
+           0.9.6.
+  * fixed: __getIndex() accessor was broken if the expression in the accessor
+           was a complex expression.
+  * fixed: Macros used in per-property reflection was possibly broken under very
+           rare conditions.
+  * fixed: URI reflection was a mess (and slow); cleaned and simplified.
+  * minor: Added function passvp() that can be used to retrieve or pass variable
+           parameters.
+  * major: Now compare() (vm level) checks for deep equality in arrays and
+           dictionaries. The relation [1,2] < [1,3] holds. Circular reference
+           prevention during those deep scans is in place too.
+  * major: Added the "eq" identity operator, so that 1 eq 1 is true, as a eq a,
+           but b = a.clone(); a eq b is false (if a is deep).
+  * fixed: falconeer.fal relied on the old(incorrect) behavior of 
+           regex.replace
+  * fixed: Item compare may not work correctly if applied to ints that were too
+           distant (> int32 range).
+  * fixed: In falcon command line tool, fixed loading of source files not 
+           terminating with .fal, and when forcing execution of fam files via the
+           -x options.
+  * fixed: indirection didn't work for classes so classnames and enums couldn't be used
+  * fixed: fallc was left behind of a version or so.
+  * fixed: Error in array generation when small grow sizes are involved in GENA 
+           opcode.
+  * fixed: Error in array generation when small grow sizes are involved in 
+           arrayBuffer() core function.
+  * fixed: In ItemArray::append( Item& ) the parameter is passed as a pointer. If
+           the array data must be relocate and the item is coming from the array
+           itself, the old memory may be gone by the time the final copy is 
+           performed. This hit particularly hard with PUSH, which puts data on
+           the stack and may get data from local vars and parameters (both in
+           the stack).
+  
+         
+Falcon (0.9.4.4)
+  * fixed: CoreTables used as sequences in for/in loops didn't mark their 
+           Falcon side Table item as owner. This caused crash with some
+           GC patterns.
+  * fixed: The context stack was lengthened, but not resized, when calling an 
+           array. This may have caused direct crashes when calling arrays on 
+           brand new stack frames (a rare, but possible situation).
+  * fixed: Grammar error on def statement caused crash.
+  * added: Object.retrieve and Object.apply BOM methods to extract and apply
+           data to objects.
+  * major: Added property accessors to classes and objects.
+  * fixed: Raising a class in the error hierarchy caused segfault.
+  * fixed: Coroutines terminating with a simple return may have killed a
+           useful value in the A register of the swapped-in new coroutine.
+  * fixed: StringStream didn't reset eof() at seek(0).
+  * minor: Better interface and improved features for Tokenizer class.
+  * fixed: In tables, Table.insert at bottom didn't work correctly.
+  * added: Methods Table.append and Table.set
+  * minor: Now tables support [] accessors (accessing a row in current page).
+  * added: TableError class for generic errors in table operations.
+  * minor: Table.find() now accepts an extra default parameter.
+  * fixed: Cleaned and clarified several error messages in table ops.
+  * fixed: Under windows, FileStat(".") wasn't working.
+           
+Falcon (0.9.4.2)
+  * fixed: After engine shutdown, some permanent memory object was not
+           cleaned (Thanks Klaim).
+  * fixed: Added method Array.NM and arrayNM function to declare "never
+           methodic" arrays, that is, arrays meant to store data and
+           that aren't to be seen as methods even when they are in
+           properties.
+  * minor: Moved VMachine::lock() (GarbageLock management) from VMachine to
+           memPool. This allow easier moving of data across VMs. Should
+           require recompilation of just a small subset of embedding
+           applications.
+  * fixed: VMachine::currentLiveModule() returned a const LiveModule by error.
+  * fixed: VMachine::setWKS wasn't properly working on singletons, due to a
+           glitch in the code.
+  * minor: Added a userItems() vector in LiveModule, that can be used safely
+           by extensions and embeddings.
+  * fixed: Stream.readLine and Stream.grabLine were not returning the last line
+           when it was broken by an EOF.
+  * minor: Better return behavior of Stream.readLine: now returns false at EOF
+           when it can't read anything.
+  * minor: Better return behavior of Stream.grabLine: now it returns an oob(0)
+           when hitting EOF after last read; this allows to use it directly
+           in comprehensions and for/in loops.
+  * minor: Added a "stream" parameter to redirect dump to another stream.
+  * fixed: Some operations on buffered streams didn't update correctly the tell()
+           indicator.
+  * fixed: overloading was not working when returning defaultProperty() in
+           synthetic classes.
+  * added: Complex class.
+  * fixed: Search for file stats (including modules) is now case sensitive on 
+           MS-Windows, at least in the last part of the file name.
+           
+Falcon (0.9.4)
+  * fixed: ClassMethod couldn't be used as classes for new instances, and
+           any class in a property would have generated a class method when
+           accessed.
+  * fixed: exit() and other termination requests are honoured in interactive
+           compiler.
+  * fixed: Re-enabled falconeer and updated falcon skeleton module.
+  * added: methods bind(), unbind(), bound() and value() to LateBind metaclass.
+  * minor: Removed VMachine::raise*Error functions. This removal has also
+           helped to spot many buglests in various modules that consisted in
+           calling the old functions, now actually shortcuts for "throw",
+           before doing some cleanup.
+  * major: VM main loop and context (coroutine) support redesigned.
+  * fixed: Some issues in coroutine swapping and spurious wakeups are now solved
+           indirectly by the new VMContext system. This also greatly improves
+           context switches times.
+  * added: Methodic function properties() to determine properties of OOP items.
+  * fixed: GC Marking of items stored uniquely as method "self" part was broken.
+  * fixed: Methods of methods was not correctly dereferenced into vm->self.
+  * major: Added support annotation attributes.
+  * major: The CoreArray is now based on an inner element derived from Sequence.
+           This makes possible to abstract many operations (but this is not visible
+           at language level).
+  * major: Added comprehension method to Array and List classes (this can be used
+           to create lists from list definitions very similarly to Python, but
+           still being more flexible.
+  * fixed: Some string methods renamed: 
+             String.backFind => String.rfind  (wasn't working anyhow)
+             String.backTrim => String.rtrim
+             String.frontTrim => String.ftrim
+  * added: Functions argv() and argd() returning respectively the vector and the
+           dictionary of the received parameters.
+  * fixed: Substring primitive wasn't correctly working when switching to 
+           international strings.
+  * fixed: Better behavior of the interactive compiler, now a bit more resistant
+           to user error.
+  * fixed: interactive mode didn't work with wide strings and international 
+           characters.
+  * added: Methodic function describe() that can be used as a reflective inspect()
+  * minor: Now using describe() instead of toString() in interactive mode.
+  * fixed: Access to static methods in classes was broken.
+  * fixed: In ranges, step 0 now represents the "default step"; open range is
+           indicated with a special value.
+  * minor: Ranged access to membuf now creates membuf slices.
+  * minor: Added function arrayCompact and method Array.compact() for finer memory
+           usage control.
+  * minor: .ptr() for integer dereferenced them; this seems to be unneeded, at
+            least in the main engine; now ptr() on integers just returns the
+            integer itself.
+  * fixed: Representation of memory buffers on big endian machines.
+  * fixed: Slowness on Sparc32 bit platform.
+  * minor: Performance issue on Big endian platforms.
+  * minor: TypeID returned by typeOf and typeId for integer items is now
+           NumericType.
+  * major: Closures are not anymore transparent (arrays). From the outside, they
+           look as functions, but they record the value of local variable.
+  * major: A more flexible definition of methods, and a more formal definition of
+           call points and call structures allowed to fix some weirdness in the
+           resolution of "self" with methodic arrays.
+  * fixed: Closures can now refer to symbols in any parent, not just in the topmost
+           parent.
+  * minor: Closed variables in closures are now always received by reference. This
+           allows all the closures created in a function to share and be able to
+           modify the same variable environment.
+  * minor: Rationalized iterators; as a result, they won't work on Strings and
+           MemBuf, for a few releases at least.
+  * minor: removed List.erase() and List.insert() (now done via iterators).
+  * major: Added comprehension to dictionaries (just as other sequences, but with 
+           pair being taken as [key, value] items for addition).
+  * major: Now, '*' operator on strings replicates them. Unicode addition is done
+           via '%', while '/' adds its argument to the last character of the string,
+           so that "a" / 1 => "b"
+  * minor: Added Set() VM assisted (sequence) class.
+  * major: Added support for generators in for/in sequences.
+  * fixed: Fixed error reporting in faldisass.
+  * fixed: Fixed error reporting in falrun.
+    
+Falcon (0.9.2)
+  * fixed: using more modern throw instead of the obsolete raise() functions
+           in many points.
+  * fixed: "find" method in strings was erroneusly named "strFind".
+  * minor: Added brigade() ETA function.
+  * fixed: Directory class wasn't masked; as a result, using it caused crash.
+           As a fix, we removed DirectoryOpen function and allowed Directory
+           constructor to work as previously done by DirectoryOpen.
+  * added: Directory.descend (it's meant to be a reminder for a complete
+           do() framework).
+  * fixed: List.first() wasn't returning a fully prepared iterator.
+  * fixed: Oob wasn't working properly on immediate strings.
+  * fixed: isoob() was returning 0 or 1 instead or false/true.
+  * fixed: PostMessage() wasn't forwarding errors to the main VM loop in case
+           of asynchronous message posting.
+  * fixed: More correct error messages in case of problems loading submodules.
+  * added: Method wordSize() to MemBuf metaclass.
+  * fixed: Particular errors in class declaration may have caused error detection
+           to segfault.
+  * fixed: Array back-mark to its table did not deep-mark its data; as a result,
+           the table got marked with the current generation and skipped its mark
+           processing loop as a standard object. This exposes the need to
+           rationalize and simplify the Garbage/mark Object/gcMark interface.
+  * fixed: LiveModule::detach() was nilling the original (imported) values
+           rather than the local objects.
+  * fixed: fself wasn't working in init blocks.
+  * fixed: Error class couldn't be inherited from scripts.
+  * fixed: For/in loops with negative step exited immediately when start == stop
+  * added: Added String.startsWith, String.endsWith, strStartWith(), strEndWith()
+  * fixed: Multiline strings in MS-Win text file format sources (CRLF) couldn't
+           be correctly parsed.
+
+Falcon (0.9.1.8)
+  * fixed: faltest didn't output help text when called with -h/-?
+  * fixed: Operator overriding in blessed dictionaries had many issues.
+  * fixed: prefix inc/dec operator overriding now returns what is returned
+           by the overriding function (formerly, it returned the item itself).
+  * fixed: StringStream wasn't respecting stream copy semantic (copy shell,
+           respect underlying stream). As a result, it couldn't be used to
+           communicate across threads.
+  * minor: StringStream is now interlocked; it can be proficiently used as
+           an interthread safe raw data exchange device.
+  * fixed: Obviating the need for ";" in function declared inside
+           dictionaries.
+  * minor: Falcon command line doesn't require full module generation to generate
+           the debug grammar tree module.
+  * major: Now allowing circular references in module loads.
+  * fixed: Unpack is now working in every situation (and generally, more
+           efficiently).
+  * fixed: Didn't set correctly the default .ftt extension for -y options, and
+           caused the original file to be overwritten.
+  * fixed: Issues on multilanguage and internationalization.
+  * minor: Added search path to the engine and to all the items involved into
+           compilation. Also, added vmSearchPath() script function to allow
+           scripts to get the path as set by the application.
+  * fixed: Format wasn't correctly parsing ":0" (zero-length variable length
+           integer formatting).
+  * fixed: Escapes at the beginning of multiline double-quote strings were lost.
+  * fixed: Possible reaping of table pages by an execessive GC usage.
+
+Falcon (0.9.1.6)
+  * fixed: In loop statement, continue looped from the top skipping the
+           loop condition (if it was present).
+  * fixed: Function "any" was STILL returning 0 instead of false.
+  * major: Added method ptr() to FBOM and various metaclasses.
+  * major: Added explicit character size scaling and c-zation of
+           Falcon::Strings.
+  * fixed: Repeated assert() may have crashed depending on the stack
+           status.
+  * fixed: Due to faulty method equality check, method unsubscription
+           was failing.
+  * minor: Added subscription priority parameter.
+  * fixed: getAssert() didn't get the correct default parameter when
+           the required slot wasn't found, and VMSlot.getAssert wasn't parsing
+           correctly its parameters.
+  * fixed: MessageError wasn't exported to the Core module.
+  * minor: Added CoreSlot.name() method.
+  * fixed: VMSlot wasn't properly setting the user data, so for/in didn't
+           know it was a sequence.
+  * minor: Added first() and last() methods to VMSlot to allow iterators
+           to work.
+  * fixed: Detach() sequence was just a draft, and didn't actually free
+           app-side data.
+  * fixed: Respecting ThreadParams settings in POSIX thread creation.
+  * fixed: Dind't correctly generate InterruptedError on VM interruption
+           requests.
+  * fixed: Function parameters were still hard-limited to 255. Now they
+           are limited to uint32 (2^32).
+  * fixed: std I/O blocked on Win7 (inheritance rights on DuplicateHandle).
+  * fixed: crash in call__ callback for functors.
+  * fixed: static initializer in classes didn't use standard definition of
+           const_atom.
+  * fixed: Secured deserialization on almost-last item.
+  * major: Added support for operator overloading in poop, and Dictionary.set()
+           /dictSet() to be able to bypass [] overloading if needed.
+  * fixed: Interoperability of FAM and serialization across endianity.
+  * fixed: Module unloading is now secure.
+  * minor: Added readURI and writeURI functions.
+
+Falcon (0.9.1.4)
+  * fixed: As now files and modules loads are URIs, and URI decoding was
+           strict, modules with international names could not be loaded
+           unless the name was previously URI escaped.
+  * minor: Now it's possible to prevent parsing (un-escaping) from URI
+           constructor.
+  * minor: Fixed error failed DLL load error report string in Windows.
+  * fixed: Now correctly importing symbols from modules named with
+           strings.
+
+Falcon (0.9.1.2)
+  * fixed: Correct parsing of octal number (0 and 7 was out...)
+  * fixed: Crash with statements == just numbers, and allowing interactive
+           compiler to parse non-stand alone expressions and evaluate them.
+  * fixed: A leftover from version 0.8.14 caused tables not to properly mark
+           their contents on garbage collection.
+  * fixed: More flexible int() and numeric() functions (thanks Kless).
+  * minor: Added functions vmModuleName, vmModulePath and vmRelativePath to
+           help solving dynamic dependencies.
+  * fixed: [DANGER]: Fixed missing GC marking of items in frame stacks (mainly
+           self and binding registers). This was in since 0.8.0; it was less
+           evident because 0.8 had sender which cached the last minus one
+           self objects, saving at least the previous caller, and it was
+           unlikely that the nth-2 caller wasn't cached somewhere else in the
+           VM.
+  * fixed: include() was using a cached pointer variable to create the error
+           message; the VM stack may have been (usually is) dirtied, so the
+           pointer was invalidated. This could have caused random crashes
+           and errors in reporting the failing module name.
+  * fixed: Finetuned module loader error reporting (now it indicates the module
+           whose dependency wasn't found).
+  * fixed: Some functional selectors (any & c) still returned 0 on false and 1
+           on true.
+  * minor: String.merge() now accepts only an array as parameters, and works
+           as String.join() does with its parameters.
+  * fixed: Const atoms din't include negative numbers (i.e. negative numbers
+           couldn't be used in enum declarations).
+  * fixed: Reporting a consistent error when aliasing different modules to the
+           same namespace.
+  * fxied: Now the VM correctly lets imported undefined symbols not being
+           part of namespaces to generate a proper error.
+
+Falcon (0.9.1)
+  * fixed: String-blocks closed with " alone on a line werent' recognized.
+  * fixed: Octal numbers weren't properly scanned.
+  * added: Support for binary numbers (0b..., "\B...") and octal with 0c...
+           and numeric neuter separator "_".
+  * fixed: (possible) race condition in VM destruction and re-creation and GC
+           VM marking.
+  * fixed: Long existing latent bug in Lists and iterators: if the GC destroyed
+           the list, the iterators may still refer to it.
+  * fixed: Some latent problem in deep marking of object/classes.
+  * major: Now lazy unload of modules on-the-fly is supported (some wip)
+  * fixed: Missing rethrow at frame return (errors inside second level
+           callItem()).
+  * fixed: Error reporting from inner compilations (include etc).
+  * fixed: Line number of errors in FTDs.
+  * fixed: Stream::readString exchanged a success for an error...
+  * fixed: Syntax errors in global statements caused the compiler to crash.
+  * fixed: Indirect operator didn't methodize callable properties.
+  * fixed: Buffered streams returned an error on EOF instead of 0.
+  * fixed: Fixed date "%m" field in to-string.
+  * fixed: Small memory leak in compiler re-initialization.
+  * fixed: Loading of deep paths (due to 0.9)
+  * fixed: Some short-to-wide chars transformation code on buffered strings
+           (latent from 0.8).
+  * fixed: Path class was working a bit randomly.
+  * fixed: FileStat class wasn't correctly caching the mtime member.
+  * major: Added detection of statements without effect (or with partial effect)
+           at compile time; useful to detect "str1"\n"str2" left from 0.8.x
+  * fixed: Errors in "loop" definitions may have caused a segfault.
+  * fixed: Seek from current position wasn't working in buffered streams.
+  * fixed: Better to always fill the error backtrace, for now.
+  * fixed: Ops, totally forgot to add the -L load path in falcon exe.
+  * fixed: Re-enabled copy-on-assign on strings; too dangerous without.
+  * fixed: As Falcon didn't destroy the VM at end, items where not propery finalized.
+  * fixed: Rare crash on static string live module owner marking. This poses a question
+           on validity of current marking algorithm for live string (to be checked out).
+  * fixed: Stream.readAvaliable() may have reported spurious false positive on UNIces.
+  * fixed: Callback frame termination handler was not set if there was just one frame
+           the stack.
+  * major: It is now possible to launch symbols as coroutines without a FORK opcode.
+  * fixed: Since 0.8.0, VMachine::callReturn restored caller exit value in case of
+           context termination. This caused spurious wakeups and signal consumptions
+           in coroutine semaphores, as the return value of the wait() function must
+           be mangled from inside the sleeping context, and may be applied when a
+           context dies. As 0.9 uses small coroutines (dying often) to send messages,
+           the effect was dramatically visible.
+
+Falcon (0.9)
+  * major: Removed "sender" from grammar.
+  * fixed: Array bindings was not correctly accounted by the Garbage
+           Collector.
+  * minor: Methods can now be called directly also on numbers.
+  * minor: Removed VMachine::compareItems; using inbound item
+           comparators.
+  * minor: Fallc now saves in UTF-8 in merge mode.
+  * major: Removed "pass" and "pass/in" statements.
+  * minor: Removed "itemCopy()" function (changed into clone() methodic FBOM).
+  * minor: Renamed FBom method into typeId (type is too useful as property name for users).
+  * minor: Revamped and methodized strFront and strBack (String.front()/String.back()).
+  * major: Removed attributes.
+  * major: Added class VMSlot, broadcast, consume, assert, retract, register and unregister
+           message oriented functions.
+  * major: Revamped Engine Message and Error system; now, they are centralized in
+           eng_messages.h, where new generic messages and errors can be simply added.
+  * minor: The engine string table is now expoerted as for any module and can be
+           internationalized.
+  * fixed: String Copy constructor didn't set export to false.
+  * minor: -L option in falcon and falrun excluded automatically the system default path.
+  * major: VFS in loading modules implemented.
+  * major: Removed the obsolete ErrorHandler mechanism and using C++ exceptions.
+  * minor: MemBuf now provides an interface with Java NIO Buffer semantics.
+  * minor: Removed factory function FileReadStats(); now the constructor in FileStats()
+           does everything.
+  * minor: Method FileStat.readStats is renamed as FileStat.read
+  * minor: Changed the order of parameters in RTL serialize() function (first the item,
+           then the stream).
+  * minor: Swapped wildcard and string parameters in strWilcardMatch.
+  * minor: Added String.join method.
+  * major: Methodized all Item API related functions.
+  * minor: Removed now useless functions arrayCopy, arrayFilter and arrayMap.
+  * minor: Removed indirect function (call, callMethod, marshal*), as they are now easily
+           available through eval() and languge operators.
+  * minor: Removed now useless function dictInsert().
+  * minor: Added methodic function strFill() / String.fill().
+  * minor: Added methodic function arrayFill() / Array.fill().
+  * minor: Added methodic function dictFill() / Dictionary.fill().
+  * major: Standard streams and local filesystem VFS providers are now
+           serving buffered streams.
+  * minor: Added getBuffering()/setBuffering() methods to Stream.
+  * fixed: Transcoding control (it is now possible to change
+           transcoders more than once).
+  * minor: Added grab(), grabLine() and grabText() methods to streams. The
+           older functions cannot return newly allocated buffers anymore.
+  * minor: read/write functions on streams now can take advantage of NIO
+           MemBuf interface.
+  * fixed: abs() was mapped to fract(!)
+  * major: Assignment does not causes strings to be automatically copied
+           anymore. Automatic copy is performed on modify (if the string
+           is static), and in deep copies of containers. Modify of non-static
+           string doesn't cause the strings to be copied (explicit .clone() is
+           required). So, a = "...", b = a, b and a will be disconnected
+           when one is modified, while a = strMerge(...), b = a, b and a would
+           reflect each other changes. This is a bit hybrid, but consequences
+           are hardly visible. The point is that if you want a mutable string
+           to be different, use an explicit .clone(), and if you want just
+           read-only strings use "...".
+  * major: New GC support: Added singleton GC with static members usedMem,
+           aliveMem, items, th_normal th_active and with static functions
+           enable() and perform(), reflecting the new engine wide GC. The
+           old functions gcEnable, gcSetThreshold, gcPerform, gcSetTimeout,
+           gcGetParams are removed.
+  * major: Introduced parametric evaluation, and oob(0/1) now works at
+           VMachine::functionalEval() level. Parametric eval is done by
+           setting &N where N 1..parmCount() to the nth parameter.
+  * minor: Removed xtimes() and empowered times(). Also, times() is now
+           methodic for Integers and Ranges. Times passes the loop number
+           via parametric evaluation (&1).
+  * minor: Added ETA methods upto() and downto() for Integer metaclass.
+  * major: Added { param => body } fast nameless function declaration.
+  * major: Binary module logical names are resolved adding _fm to the
+           searched module name. In example, "load module" searches for
+           module_fm.dll. Fam/fal/ftd file resolution is unchanged.
+  * major: The loop statement now supports a conditional ending.
+           The end keyword of the loop statement block can be followed by
+           an expression; the loop terminates when the condition is true
+           (same as repeat/until).
+  * fixed: Naming two times a closed variable in closures caused the
+           parameter resolution order to be messed up.
+  * major: Removed 'lambda' keyword. Use {=>} instead.
+  * major: Added 'fself' keyword referring to the current symbol being
+           executed. Won't work with methods for now.
+  * minor: Added 'getProperty' and 'setProperty' methods to deep items
+           meta-classes.
+  * minor: Added 'name' and 'caller' methods to function metaclass.
+  * fixed: Fixed crash when inserting just single constants in interactive
+           compiler.
+  * major: Removed dot-quoted strings (.")
+  * major: Removed automatic joining of adjiacent double quoted string.
+           Now, "a" "b" are two separated tokens.
+  * minor: Added compiletime parsing of + and * operators on strings. This
+           means that it is possible to join strings at compile time via
+           "a" + "b"
+  * minor: Binary operators can accept an optional EOL after them. A line can
+           terminate with a + and the expression can continue on the next
+           line without a \ to join them.
+  * major: Literal strings now never escape with a \. "\" is always
+           considered just a \; to add a single quote in a literal (single
+           quoted) string, write a single quote twice ('').
+  * major: Multiline strings are now initiated with a single open " or '
+           followed by an EOL. They terminate to the matching " or ', and
+           the context coninues to the end of the terminator line.
+           Double-quoted strings are non-literal, and compress new line and
+           leading whitespace characters into a single space, while single
+           quoted strings are literal, and insert into the string any space
+           and line break in the source. This means that double quoted
+           strings can be used to break a long string across multiple lines
+           and arbitrarily indented, while single quoted strings define a
+           verbatim block.
+
+
+Falcon (0.8.14)
+  * fixed: Now asObject() raises an error if the item is not an object;
+           this grant safety for methods that are not considered static.
+  * fixed: Pow function (possibly to be deleted) was taking the first
+           argument twice.
+  * fixed: transcodeTo/transcodeFrom was actually not published correctly
+           by the core module.
+  * fixed: Expressions in "from" clauses (init expressions) may not resolve
+           correctly symbols if the body of the object or class was empty.
+           This caused assert and crash if generating expressions with symbols
+           during "from" clauses of otherwise bodyless objects and classes.
+  * fixed: Relevant warnings in array LDV/range (check order priority).
+  * fixed: Relevant warnings symbol table generation (check order priority).
+  * fixed: Generating a range from bogus values didn't raise a type error.
+  * fixed: Import from module used "=" instead of "as" (leftover).
+  * added: Reintroduced for/to grammar, (step now substituted by "," ),
+           actually a candy grammar for for/in.
+  * added: OOB opcode which manages out of band items.
+  * added: OOB operators: ^+ (oob), ^- (deoob), ^? (isoob), ^! (invert oob status)
+  * minor: Removed function inspectShort() and secured/empowered inspect().
+  * minor: Added parameter defItem to arrayBuffer to "replicate items in arrays".
+  * fixed: Range change in arrays was taking one item too much.
+  * fixed: Exotic range applications (as substitutions in reverse ranges with
+           negative indices) wasn't working as expected. Part of it was due to
+           missing or approximative definition, part to plain errors. Now the
+           semantic of ranged access is defined and enforced through all the
+           operators and RTL functions.
+  * minor: VMachine::launch() is now necessary to start executing the main script
+           even if launchAtLink() is true at link time. In other words,
+           launchAtLink() controls only the execution of the main symbol in the
+           non-main scripts.
+  * minor: falrun now returns 255 on vm error.
+
+
+Falcon (0.8.12)
+  * major: Support for class-driven full reflection and 0-space contstant/reflected
+      classes.
+  * major: Changes to FileStat interface:
+      - FileStat.type becomes FileStat.ftype
+      - FILE_TYPE_* constants are now static properties of FileStat.
+  * major: Added support for module dynamic symbol creation on script request.
+  * major: Added import [sym1, sym2, ... symN] from Module grammar.
+  * fixed: Assigments shouldn't define symbols accessed or called.
+  * fixed: continue dropping wasn't working for last elements in dictionaries.
+  * minor: Now it is possible to alter static properties by their class name.
+  * fixed: Some type error in VM should have been catchable, but was raised hard.
+  * fixed: The compiler didn't always add module strings as symbol names.
+  * fixed: Broadcast may have broadcast double in case of a single receiver not
+            returning true.
+  * minor: Added attributeByName function.
+  * major: RTL module is removed (merged with core).
+  * major: Now main code of modules is always executed. Added vmIsMain() function
+           in core to be able to check if the current module is meant as main module
+           or not.
+  * minor: Added testAttribute() function to test for attributes.
+  * major: Added interactive mode to Falcon command line tool.
+  * minor: Option -D (set directive) has been moved to -d;
+           -D sets compile time constants.
+  * major: Macro and Meta compilation added. The escapes \[ and \] perform meta
+           compilation, and the macro keyword and \\ escapes are candy grammar
+           for macro compilation.
+  * major: Added support for late binding.
+  * major: Added local/late binding in functional constructs.
+  * major: Added dynamic symbol resolution for arrays.
+  * bufix: deadlocks at coroutine end when some context was waiting
+           endless was not detected.
+  * minor: added ETA functions let (assign) and lbind (make late binding).
+  * minor: ',' can now be optionally used in .[] decl.
+  * fixed: dolist wasn't breaking on oob(nil), but on just false.
+  * major: Forward binding implemented. Currently used to resolve
+           named parameter function calls.
+  * minor: include() function added to Core module allowing dynamic module
+           loading directly from base programs.
+  * minor: added vmFalconPath() informative function.
+  * major: Addition and self addition on strings now forces conversion of the
+           target object into a string. I.e. "H" + 1 => "H1". Integer UNICODE
+           operations are now delegated to the "*" and "*=" operators. So,
+           "Hello" * 32 + "World" => "Hello World" and "H" *= 65 => "HA".
+  * fixed: URI.encode() was actually decoding.
+  * minor: Introduced xtimes() function which works like times(), but evaluates
+           all the items in sequence instead of just running them.
+  * major: Added TABULAR PROGRAMMING:
+           - Added Item type "TabMethod" to store methods for arrays/tables
+           - Self item is now propagated to functions called inside arrays.
+           - Table column can now be used as properties of arrays inside the tables.
+  * fixed: Assignments to properties and vector didn't propagate the assignand
+            value.
+  * fixed: Fixed compilation on Darwin.
+  * fixed: Fixed missed mark of some deep item during GC (may have caused random
+            crashes).
+  * major: Added the concept of "blessed dictionary" that is seen as an instance.
+  * minor: Much more sensible policy of EOL removal in FTD escapes.
+  * minor: Added function valof returning the value of a variable or the return value
+           of a callable item.
+  * major: Added import aliasing.
+  * major: Inheritance initialization parameter can now be any expression.
+  * fixed: Disregarding old bytecode .fam files didn't work correctly.
+  * minor: Added the eval unary prefix operator, first of cap-special operators: "^*"
+           works a bit like eval() function, but much more efficient, expecially in
+           the fast path.
+
+Falcon (0.8.10)
+  * minor: Now classes can be stored in object properties and called to get
+      an instance.
+  * bugfix: Indirect operator wasn't peeking the global table after having
+      failed in searching the local table.
+  * bugfix: When a "module provider" was given to runtime, test for already
+      existing modules was always positive.
+  * bugfix: fixed ftd line count, export/load directives and reenabled \n
+      after a "?>"
+  * minor: Added numeric() function to core
+  * major: Removed forall and added formiddle which runs after every element
+      except the last one (even if "forlast" isn't provided).
+  * minor: dirMake() has now an extra parameter; if provided and true, the
+      function works as mkdir -p; creates the whole heirarcy, and succeeds
+      also if the directory is already present.
+  * major: added boolean type. Now, true/false are special compilator tokens
+      which generate a boolean item. Every VM check results in a boolean
+      item being returned.
+  * bugfix: Falcon binary didn't return the VM exit code to the shell.
+  * minor: Load now supports ".module" notation to load sibling modules.
+  * major: Added import directive for explicit symbol import.
+  * bugfix: Fixed deep user data GC marking in methods and classmethods.
+  * bugfix: Parameters in FBOM function calls was not removed from stack.
+  * minor: It is now possible to call functions stored in classes; class functions
+      not referencing "self" can be safely called this way, which makes them "static".
+  * bugfix: Timestamp.distance() was returning a random value instead of nil.
+  * Minor: Added Path reflexive class to RTL.
+  * Minor: Added URI reflexive class to RTL.
+  * Major: Added MemBuf type and relative support.
+  * Minor: Added functions strToMemBuf and strFromMemBuf in RTL
+  * Minor: Added MemBuf support for Stream.read(), Stream.write(), transcodeTo() and transcodeFrom().
+  * Minor: Added start parameter to Stream.write()
+  * Bugfix: size parameter was not correctly used in Stream.write()
+  * Minor: Added internal SharedUserData class which can be used for data shared among many
+           objects.
+  * Minor: Added inspectShort() function that provides a more compact inspect().
+  * Bugfix: Switches couldn't accept negative numbers.
+  * Major: Now "=" always assigns, and "==" is used for comparisons.
+  * Major: Remove assignment statement(s). All assignments are now expressions.
+  * Major: Anonymous function declaration is now an expression.
+  * Major: Anything may be place left of an assignment.
+  * Major: Removed for/to loop and added a step parameter to ranges. For/in loop on steps
+           have now the same functionalities as the old for/to loop. "step" is not anymore
+           a reserved word.
+  * Major: Now nameless functions and lambda are "closures".
+  * Minor: Added statement "innerfunc" creating a non-closure function.
+  * Minor: Added "enum" statement which can create a set of constants.
+  * Minor: Statement give/to can now give attributes to (or remove them from) a list of
+           objects.
+  * Minor: Better management of INC/DEC; added INCP/DECP opcodes to allow faster inc/dec.
+  * Bugfix: Error.description wasn't correctly reflected.
+  * Minor: Added method Error.heading() to access the heading of an error without the stack trace.
+  * Major: VM can now be interrupted in compliant waiting operations. ATM, stream and socket
+           readAvailable & writeAvailable have been instrumented. Interruption will raise
+           an InterruptedError, can be catched and operations can be resumed.
+  * Minor: RangeError renamed into AccessError.
+  * Major: Added broadcast replies (returning from broadcast with an OOB item).
+  * Minor: Added function vmSystemType() to access underlying target compilation system.
+  * Minor: Aliased the function paramNumber() to parameter(). The function paramNumber() is
+           still available but deprecated.
+  * Minor: Added first and last BOM methods.
+  * Minor: Added RTL function randomDice
+  * Minor: Added Stream.flush method in RTL (ops...)
+  * Minor: Added RFC2822 date management.
+  * Minor: Fixed unspotted bug in "-c" option for falcon.
+  * Major: PCODE version moved to 2.0
+  * Major: Added register Latch and Latcher in VM, working for LDP/LDV
+  * Minor: Automatically disregarding outdated .fam when trying to load source modules.
+  * Minor: Added "times" functional construct (ETA function). It's a kind of functional
+		   for/in loop.
+  * Minor: Added pluggable support for multithreading locking scheme and atomic operation
+           providers (rudimental, but working).
+  * Minor: Added directive "version"=number (0x[VVV]VMMmm) and the function vmModuleVersionInfo()
+           to store and access script and .fam version informations.
+  * Bugfix: fixed traceback corruption in error reporting when uncatching-retrhowing from a
+            in-between try-frame.
+  * Major: Added support for 0 overhead string internationalization.
+  * Major: Binary operators grammar changed. Binary and is now &&, binary or is || and binary xor is ^^;
+           Auto assigment stays &=, |= and ^=. Binary not is now ~.
+           (This is because we need some of those symbols for other things in the next releases).
+  * Bugfix: strFind and strBackFind didn't work correctly and may crash when receiving wrong values.
+  * Major: Provided FAL_MODSTR macro (family) to create module specific string tables.
+
+Falcon (0.8.8)
+  * bugfix: TRAV opcode may destroy its parameters while setting first loop
+      on rare conditions. Fixed.
+  * major: VM now has a map of modules and global variables instead of two
+      parallel arrays. This allows arbitrary module unlinking.
+  * major: Item size is now 16 bytes. This allow space for stepped ranges.
+  * major: Added WKS/WKI (Well Known Symbols/Items) system to obviate the need
+      to share global items with scripts and create failsafe instances of
+      classes.
+  * bugfix: Fixed TimeStamp distance algorithm.
+  * minor: List initialization is now possible also with non-atomic symbols.
+  * bugfix: Precision in printing default flotaing point number was 6; now is
+      16 (maximum precision for our number format).
+  * minor: Added strWildcardMatch in RTL for simle *.*-like wildcard matching.
+  * minor: Added ETA function firstOf() that retruns the first non-false parameter.
+  * bugfix: When having more than one context, each stack had a different
+      treshold, possibly causing some of the stacks to crash on realloc.
+  * bugfix: Path of the offending module was not shown when reporting compiler errors.
+  * major: Load directive can now handle dot modules "a.b"
+  * bugfix: ModLoader::addSearchPath didn't locally bufferize the path, and this may
+            have caused problems with incoming fixed strings.
+  * minor: Added fileCopy() function in rtl (file_ext).
+
+Falcon (0.8.6)
+  * bugfix: incorrect format of 0.x floating point numbers.
+  * major: Completed attribute model.
+  * major: Improved functinal support. Added lit() and choice().
+  * bugfix: Fixed initial search path for faltest.
+  * bugfix: Fixed crash in moduleloader with empty paths.
+  * major: Added message oriented programming model.
+  * major: Flat VM model implemented.
+  * minor: Added round, ceil, floor, fint and abs math functions.
+  * minor: Fixed default representation of floating point numbers, and
+      recogninzing long integer NAN.
+  * minor: int() core function now raises a range error in case the given
+      fp number cannot be represented in an int64.
+  * minor: loop statement now accepts a statement on the same line for
+      candy grammar.
+  * minor: added arrayHead function in rtl.
+  * minor: strHead, strHeadTrim, strTail, strTailFind have been renamed
+      respectively to strFront, strFrontTrim, strBack, strBackFind for
+      coherency with nomenclature.
+  * major: Added List class with support in for/in and CORE iterator.
+  * major: Added support for generic sequence object and deep GC marking.
+  * minor: Added addSingleton method to Module class for easier embedding.
+  * minor: Added marshallCB* series to dispatch events to handlers in objects.
+  * bugfix: fixed self/sender sequence for callable arrays used as methods.
+  * bugfix: array and property assignment now copies strings by value.
+  * bugfix: One line for/in statement COLON rule caused crash.
+  * minor: Changed "<" fast print into ">>".
+  * bugfix: In case of callitem() from toplevel, errors were not managed correctly.
+  * bugfix: Generic array resize (to smaller size) was wrong, and caused VM stack
+            corruption when big arrays and recursions were performed.
+  * minor: the "_" prefix for symbols is now used for private usage in classes.
+  * bugfix: Lexer didn't recognize unclosed contexts at end of file.
+  * major: Added dot-square array declaration, and better management of contexts
+           /eol in array/list declarations.
+  * major: Added compiler directive support. Now "def" wokrs on directive.
+
+Falcon (0.8.4)
+  * major: Old "lambda expressionss" are now "nameless functions". They are declared
+    through variable = function(...) ... end  (which was the most common
+    pattern for the old usage of lambda expressions
+  * major: Lambda expression grammar is much simplified, and they allow only one
+    expression as body.
+  * major: Added .ftd (falcon template document) file type. It's a outer-escaped
+    document (php/asp like) where unescaped literal code and escaped code
+    can be seamlessly merged.
+  * bugfix: Linear dictionary didn't break search loop in case of VM error.
+  * bugfix: VM cleared register A when comparing items. This caused weird
+    errors in dictionaries when the objects overloaded compare().
+  * bugfix: Fixed try/catch sequences across internal frames
+  * improvement: ^^^this also allowed to remove the ugly trypos structure.
+  * bugfix: PSIN opcode extracted an unexisting second parameter; in case
+    of dirty data that caused an assert.
+  * design: Fixed compilation and build settings with MINGW.
+  * bugfix: Fixed default load path of faltest.
+  * improvement: Added a user data pointer to VM (useful for binary compatibility)
+  * minor: Unclosed scoping errors now report where the scope was open.
+  * improvement: added min, max, all, any, allp, anyp, map, xmap, filter, reduce,
+    iff, cascade functions for minimal functional support.
+  * major: callable arrays for deferred calls and functional support.
+  * bugfix: AutoCString and AutoWString may convert incrrectly due to sign mismsatch
+    in the return value of String::toCString()/String::toWString(). Fixed (and returing
+    uint32).
+  * minor: Semaphore wait() can now be timed.
+
+Falcon (0.8.3)
+  * VM optimizations of about 20-25%
+  * VM Stack can now automatically shrink on need
+  * Item size reduced to 12 bytes
+  * GENR opcode didn't work correctly when operands were float.
+  * Added lenght recording to autocstring and autowstring
+  * Updated REGEX to PCRE 7.2
+  * Added compare() and version() methods for Regex class.
+  * in Error, added a method to stringize only the error header.
+  * Fixed ROStream destruction sequence.
+  * Fixed GetSystemEncoding (caused falcon cmdline to fail recognize default encodings)
+  * Added ideographic space to whitespaces and ideographic quotes to string quotes.
+  * Fixed some docs.
+
+Falcon (0.8.2)
+  * String::toCString now returns immediately if space is too short.
+  * String::toWString now returns size of converted string or -1 on error.
+  * AutoCString and AutoWString classes were not correctly exported in Windows.
+  * Fassert.h didn't compile under MINGW.
+  * Now switch on objects working in every case (including compare() overload)
+  * Now operators - and -= remove element(s) from arrays and dictionaries
+  * More rational and elegant class interface for garbage collection objects.
+  * More rational and elegant string classes constructors.
+  * Cleaner class interface for module loader search path specification.
+  * Added load module and file interface directly from Runtime
+  * END opcode now nils the A register of the VM if quitting.
+  * randomSeed() in RTL now randomizes on timer if called without parameters.
+  * Added VMachine::gcLock()/gcUnlock() to allow simpler registration of callbacks.
+
+Falcon (0.8.1)
+  * Fixed bug in VM allocation of temporary vardef that caused
+    crash when using special memory allocator.
+  * Added option -M to faltest to check for memory leaks
+  * Added option -C to falcon to check for memory leaks
+  * Removed memory leaks in some VM oprations, in maps, in compiler
+    tree destruction, module and symbol destruction and many more.
+  * Fixed timestamp method compare() that didn't allow for comparation
+    against other types.
+  * TimeStamp.toString() created a string too wide by one.
+  * Empty loops always generate code. Optimization is to be performed
+    by the (still unwritten) optimizer.
+  * stdOut() &c now return a system-transcoded stream. To obtain a
+    raw stream, use stdOutRaw() etc.
+  * Regex.replaceAll() was broken in case of multiple submatches.
+  * ProcessHandler last error was not zeroed in creation, causing random
+    false negatives (process created ok, but reported error).
+  * samples/procLoad.fal updated with correct Error class structure
+  * Updated docs.
+  * Added BOM serialization and item level cloning.
+  * Added cloning support for streams.
+  * Added cloning support for timestamps.
+  * Items containing objects and classe were not evaluated as true; fixed
+  * Added AutoCString and AutoWString class helpers for eaiser conversion
+    of falcon items and strings to POD C data.
+  * The Falcon::core::sleep function was correctly resolved when the application
+    linked against Falcon .so in linux, but when it was loaded indirectly, in
+    example, as a cascade load some app's plugin using falcon, it was resolved to the
+    system sleep() instead!!!! --- so it has been renamed to Falcon::core::_f_sleep().
+  * Fixed VM stack push (GenericVector couldn't push to themselves).
+  * Fixed VM context rotation for coroutines managed outside plugins.
+
+Falcon (0.8)
+
+  * Prepared complete Debian packaging and fixed build issues.
+  * Starting massive development.
+
+ -- Chr. Giancarlo Niccolai <gc_ /at/ _falconpl.org>  2007-04-08
