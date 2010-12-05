@@ -88,24 +88,20 @@ void Renderer::render ()
     if (diff < 2000)
     {
         glClearColor ( 1.0, 1.0, 0.0, 1.0 );
-        glClear ( GL_COLOR_BUFFER_BIT );
-        SDL_GL_SwapWindow(window);
     }
     else if (diff < 4000)
     {
         glClearColor ( 0.0, 1.0, 0.0, 1.0 );
-        glClear ( GL_COLOR_BUFFER_BIT );
-        SDL_GL_SwapWindow(window);
     }
     else if (diff < 6000)
     {
         glClearColor ( 0.0, 0.0, 1.0, 1.0 );
-        glClear ( GL_COLOR_BUFFER_BIT );
-        SDL_GL_SwapWindow(window);
     }
     else
     {
         startTime = SDL_GetTicks();
     }
 
+    glClear ( GL_COLOR_BUFFER_BIT );
+    SDL_GL_SwapWindow(window);
 }

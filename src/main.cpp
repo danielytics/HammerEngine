@@ -40,9 +40,7 @@ int main (int argc, char** argv)
     SDL_Event event;
     bool running = true; // Local running flag to avoid hitting the core interconnect every frame
 
-    std::cout << SDL_QUIT << "\n";
     try {
-        std::cout << "renderer.init(512, 512, false)\n";
         renderer.init(512, 512, false);
 
         // Run input/rendering loop
@@ -58,7 +56,6 @@ int main (int argc, char** argv)
                     {
                         if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
                         {
-                            std::cout << "SDL_KEYDOWN SDL_SCANCODE_ESCAPE\n";
                             running = false;
                         }
                         /*
@@ -72,10 +69,8 @@ int main (int argc, char** argv)
                 case SDL_WINDOWEVENT:
                     // Window close butten pressed
                     {
-                        std::cout << "SDL_WINDOWEVENT " << event.quit.type << "\n";
-                        if (event.quit.type == SDL_QUIT)
+                        if (event.window.event == SDL_WINDOWEVENT_CLOSE)
                         {
-                            std::cout << "SDL_QUIT\n";
                             running = false;
                         }
                     }
