@@ -6,8 +6,11 @@
 class LogStream
 {
 public:
+    LogStream ();
+
     LogStream& operator << (const std::string& output);
     LogStream& operator << (const unsigned int output);
+    LogStream& operator << (const signed int output);
     LogStream& operator << (const double output);
     LogStream& operator << (const char output);
 };

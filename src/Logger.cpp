@@ -6,7 +6,7 @@ Logger::Logger()
 {
 }
 
-void Logger::write (const LoggerLevel level)
+void Logger::write (const LoggerLevel level, const LogStream& stream)
 {
 
 }
@@ -23,6 +23,12 @@ LogStream& LogStream::operator << (const std::string& output)
 }
 
 LogStream& LogStream::operator << (const unsigned int output)
+{
+    std::clog << output;
+    return *this;
+}
+
+LogStream& LogStream::operator << (const signed int output)
 {
     std::clog << output;
     return *this;

@@ -10,7 +10,7 @@ DESTDIR = ../bin/
 CONFIG += console
 CONFIG   -= app_bundle
 TEMPLATE = app
-QMAKE_CXXFLAGS_RELEASE += -O3 -mmmx -msse -msse2 -msse3 -mfpmath=sse
+QMAKE_CXXFLAGS_RELEASE += -O3 -mmmx -msse -msse2 -msse3 -mfpmath=sse -DPROFILER_ENABLED
 QMAKE_CXXFLAGS_RELEASE -= -O2
 
 INCLUDEPATH += ../depends/falcon/include \
@@ -24,10 +24,12 @@ SOURCES += main.cpp \
     Script.cpp \
     Graphics.cpp \
     Info.cpp \
-    Logger.cpp
+    Logger.cpp \
+    Profiler.cpp
 
 HEADERS += \
     Renderer.h \
     Graphics.h \
     Info.h \
-    Logger.h
+    Logger.h \
+    Profiler.h

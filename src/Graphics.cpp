@@ -1,5 +1,6 @@
 
 #include "Graphics.h"
+#include "Profiler.h"
 
 Graphics::Graphics (const std::string& name) :
         inited(false),
@@ -16,6 +17,8 @@ Graphics::~Graphics ()
 
 void Graphics::init (unsigned int width, unsigned int height, bool fullscreen, bool vsync)
 {
+    profile("Graphics::init");
+
     // Make sure there is no existing window or opengl context
     term();
 
@@ -59,6 +62,8 @@ void Graphics::term ()
 {
     if (inited)
     {
+        profile("Graphics::term");
+
         // Terminate OpenGL
         if (context)
         {
@@ -78,6 +83,8 @@ int state = 0;
 
 void Graphics::render ()
 {
+    profile("#Graphics::render");
+
     unsigned int diff = SDL_GetTicks() - startTime;
 
     if (!flag)
