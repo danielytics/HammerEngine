@@ -22,7 +22,12 @@ LIBS += -L../depends/falcon/lib/ -lfalcon_engine.dll \
 
 SOURCES += main.cpp \
     Script.cpp \
-    Renderer.cpp
+    Graphics.cpp \
+    Info.cpp \
+    Logger.cpp
 
 HEADERS += \
-    Renderer.h
+    Renderer.h \
+    Graphics.h \
+    Info.h \
+    Logger.h

@@ -7,7 +7,7 @@
 
 #include <string>
 
-class Renderer
+class Graphics
 {
 private:
     bool inited;
@@ -18,8 +18,8 @@ private:
     unsigned int startTime;
 
 public:
-    Renderer (const std::string& name);
-    ~Renderer ();
+    Graphics (const std::string& name);
+    ~Graphics ();
 
     void init (unsigned int width, unsigned int height, bool fullscreen, bool vsync=true);
     void term ();

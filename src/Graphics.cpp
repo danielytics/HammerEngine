@@ -1,7 +1,7 @@
 
-#include "Renderer.h"
+#include "Graphics.h"
 
-Renderer::Renderer (const std::string& name) :
+Graphics::Graphics (const std::string& name) :
         inited(false),
         gameName(name),
         window(0),
@@ -9,23 +9,15 @@ Renderer::Renderer (const std::string& name) :
 {
 
 }
-Renderer::~Renderer ()
+Graphics::~Graphics ()
 {
-    if (inited)
-    {
         term();
-    }
 }
 
-void Renderer::init (unsigned int width, unsigned int height, bool fullscreen, bool vsync)
+void Graphics::init (unsigned int width, unsigned int height, bool fullscreen, bool vsync)
 {
-    // Make sure there is no existing window, opengl context or SDL system running
+    // Make sure there is no existing window or opengl context
     term();
-
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        throw std::string("Could not init SDL");
-    }
 
     // Request an opengl 3.2 context.
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -63,7 +55,7 @@ void Renderer::init (unsigned int width, unsigned int height, bool fullscreen, b
     startTime = SDL_GetTicks();
 }
 
-void Renderer::term ()
+void Graphics::term ()
 {
     if (inited)
     {
@@ -77,8 +69,6 @@ void Renderer::term ()
         {
             SDL_DestroyWindow(window);
         }
-        // Terminate SDL
-        SDL_Quit();
         inited = false;
     }
 }
@@ -86,7 +76,7 @@ void Renderer::term ()
 bool flag = false;
 int state = 0;
 
-void Renderer::render ()
+void Graphics::render ()
 {
     unsigned int diff = SDL_GetTicks() - startTime;
 

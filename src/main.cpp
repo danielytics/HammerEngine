@@ -1,5 +1,5 @@
 
-#include "Renderer.h"
+#include "Graphics.h"
 
 #include <iostream>
 
@@ -34,89 +34,105 @@ int logicThread (void* data)
 
 int main (int argc, char** argv)
 {
-    Renderer renderer("Norse Game");
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        std::cerr << "Could not init SDL\n";
+        return -1;
+    }
+    bool threadInited = false;
 
-    bool threadRunning = true; // Running flag shared accross processor cores
-    SDL_Thread* logic = SDL_CreateThread(logicThread, &threadRunning );
+    {
+        Graphics graphics("Norse Game");
 
-    SDL_Event event;
-    bool running = true; // Local running flag to avoid hitting the core interconnect every frame
+        bool threadRunning = true; // Running flag shared accross processor cores
+        SDL_Thread* logic = SDL_CreateThread(logicThread, &threadRunning );
+        threadInited = true;
 
-    unsigned int frameTimer;
-    unsigned int elapsedTime;
-    unsigned int frames = 0;
-    float framerate = 0;
-    float total = 0;
-    unsigned int numFrames = 0;
+        SDL_Event event;
+        bool running = true; // Local running flag to avoid hitting the core interconnect every frame
 
-    try {
-        //renderer.init(512, 512, false);
-        renderer.init(1024, 768, true);
-        frameTimer = SDL_GetTicks();
+        unsigned int frameTimer;
+        unsigned int elapsedTime;
+        unsigned int frames = 0;
+        float framerate = 0;
+        float total = 0;
+        unsigned int numFrames = 0;
 
-        // Run input/rendering loop
-        while (running)
-        {
-            // Get input events.
-            while(SDL_PollEvent(&event))
+        try {
+            //graphics.init(512, 512, false);
+            graphics.init(1024, 768, true);
+
+            frameTimer = SDL_GetTicks();
+
+            // Run input/rendering loop
+            while (running)
             {
-                switch (event.type)
+                // Get input events.
+                while(SDL_PollEvent(&event))
                 {
-                case SDL_KEYDOWN:
-                    // Key was pushed
+                    switch (event.type)
                     {
-                        if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                    case SDL_KEYDOWN:
+                        // Key was pushed
                         {
-                            running = false;
+                            if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                            {
+                                running = false;
+                            }
+                            /*
+                            Input events should be translated to commands and dispatched to the Player Controller.
+                            */
                         }
-                        /*
-                        Input events should be translated to commands and dispatched to the Player Controller.
-                        */
-                    }
-                    break;
-                case SDL_KEYUP:
-                    // Key was released
-                    break;
-                case SDL_WINDOWEVENT:
-                    // Window event received
-                    {
-                        if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-                        // Window close butten pressed
+                        break;
+                    case SDL_KEYUP:
+                        // Key was released
+                        break;
+                    case SDL_WINDOWEVENT:
+                        // Window event received
                         {
-                            running = false;
+                            if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+                            // Window close butten pressed
+                            {
+                                running = false;
+                            }
                         }
+                        break;
+                    default:
+                        break;
                     }
-                    break;
-                default:
-                    break;
+                }
+                graphics.render();
+
+                // Calculate frame rate (number of "frames" rendered to the screen per second; game logic runs unsynchronized with the renderer)
+                ++frames;
+                elapsedTime = SDL_GetTicks() - frameTimer;
+                if (elapsedTime > FRAMERATE_COUNTER_LATENCY)
+                {
+                    framerate = (float)(1000 / elapsedTime) * (float)(frames);
+                    frames = 0;
+                    total += framerate;
+                    numFrames++;
+                    frameTimer = SDL_GetTicks();
                 }
             }
-            renderer.render();
-
-            // Calculate frame rate (number of "frames" rendered to the screen per second; game logic runs unsynchronized with the renderer)
-            ++frames;
-            elapsedTime = SDL_GetTicks() - frameTimer;
-            if (elapsedTime > FRAMERATE_COUNTER_LATENCY)
-            {
-                framerate = (float)(1000 / elapsedTime) * (float)(frames);
-                frames = 0;
-                total += framerate;
-                numFrames++;
-                frameTimer = SDL_GetTicks();
-            }
         }
-    }
-    catch (const std::string& error)
-    {
-        std::cerr << "Game terminated with error: " << error << "\n";
+        catch (const std::string& error)
+        {
+            std::cerr << "Game terminated with error: " << error << "\n";
+        }
+
+        // Terminate logic thread
+        if (threadInited)
+        {
+            threadRunning  = false; // Share running flag accross interconnect to other thread
+            int status;
+            SDL_WaitThread(logic, &status);
+        }
+
+        std::cout << "Average framerate: " << (total / numFrames) << "\n";
     }
 
-    // Terminate logic thread
-    threadRunning  = false; // Share running flag accross interconnect to other thread
-    int status;
-    SDL_WaitThread(logic, &status);
-
-    std::cout << "Average framerate: " << total << " " << numFrames << " = " << (total / numFrames) << "\n";
+    SDL_Quit();
 
     return 0;
 }
