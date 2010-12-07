@@ -22,6 +22,7 @@ public:
 
     static void init ();
     static void term (const char* filename);
+
 };
 
 #endif // PROFILER_H

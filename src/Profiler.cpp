@@ -6,64 +6,103 @@
 #include <string>
 #include <fstream>
 
-struct __attribute__ ((__packed__)) BlockRun
-{
-    unsigned int runTime;
-    unsigned int timeStamp;
-    unsigned int duplicates;
-};
+#include <iostream>
 
+// Get an item from a map, specified by key, or val if key does not exist
+template <typename K, typename V> V get(const std::map<K, V>& m, const K& key, const V& val)
+{
+    typename std::map<K, V>::const_iterator it = m.find(key);
+    if ( it == m.end() )
+    {
+        return val;
+    }
+    else
+    {
+        return it->second;
+    }
+}
+
+// Data structure to hold the run times, counts and child blocks of profiled code blocks
 struct ProfileData
 {
-    ProfileData () : runTime(0), runCount(0) {}
+    ProfileData (const std::string& n) : name(n), runTime(0), runCount(0), parent(0) {}
+    const std::string name;
     unsigned int runTime;
     unsigned int runCount;
-    std::vector<BlockRun> runs;
+
+    ProfileData* parent;
+    std::map<std::string, ProfileData*> children;
 };
 
-std::map<std::string, ProfileData> blocks;
-SDL_mutex* lock;
+// Current block in each thread
+std::map<SDL_threadID, ProfileData*> current;
+std::map<SDL_threadID, std::vector<ProfileData*> > roots;
 
+SDL_mutex* lock; // Lock to ensure threads do not corrupt the data, will be under high contention, so the profiling code is not suitable for release builds
+
+// A profiled code block has been entered
 Profiler::Profiler (const char* name) :
         blockName(name),
         startTime(SDL_GetTicks())
 {
+    SDL_threadID threadID = SDL_ThreadID();
+    SDL_mutexP(lock); // Lock
+
+    // Get the current block for this thread
+    ProfileData* pd = get(current, threadID, (ProfileData*)0);
+    ProfileData* block;
+    if (pd == 0)
+    {
+        std::vector<ProfileData*>& rootList = roots[threadID];
+        for (std::vector<ProfileData*>::iterator i = rootList.begin(); i != rootList.end(); i++)
+        {
+            if ((*i)->name == name)
+            {
+                pd = *i;
+                break;
+            }
+        }
+        if (pd == 0)
+        {
+            pd = new ProfileData(blockName);
+            roots[threadID].push_back(pd); // Ensure the root blocks are always accessible
+        }
+        block = pd;
+    }
+    else
+    {
+        block = get<std::string, ProfileData*>(pd->children, name, 0);
+        if (block == 0)
+        {
+            // If child block does not yet exist, create it and set its parent to the current block
+            block = new ProfileData(blockName);
+            block->parent = pd;
+            pd->children[name] = block;
+        }
+
+    }
+
+    // Increment block run count
+    block->runCount++;
+
+    // Set block as the current block
+    current[threadID] = block;
+
+    SDL_mutexV(lock); // Unlock
 }
 
+// A profiled code block has been exited
 Profiler::~Profiler ()
 {
+    SDL_threadID threadID = SDL_ThreadID();
     SDL_mutexP(lock); // Lock
-    // Record aggregate information
-    ProfileData& pd = blocks[blockName];
-    pd.runTime += (SDL_GetTicks() - startTime);
-    pd.runCount++;
 
-    if (blockName[0] != '#')
-    {
-        // Record single block runs
-        BlockRun br;
-        br.runTime = SDL_GetTicks() - startTime;
-        br.timeStamp = startTime;
+    // Get the current block for this thread
+    ProfileData* pd = current[threadID];
+    pd->runTime += (SDL_GetTicks() - startTime);
 
-        if (pd.runs.size() > 0)
-        {
-            BlockRun& last = pd.runs.back();
-            if (last.timeStamp == br.timeStamp && last.runTime == br.runTime)
-            {
-                last.duplicates++;
-            }
-            else
-            {
-                br.duplicates = 0;
-                pd.runs.push_back(br);
-            }
-        }
-        else
-        {
-            br.duplicates = 0;
-            pd.runs.push_back(br);
-        }
-    }
+    // Switch to parent block
+    current[threadID] = pd->parent;
 
     SDL_mutexV(lock); // Unlock
 }
@@ -73,31 +112,40 @@ void Profiler::init ()
     lock = SDL_CreateMutex();
 }
 
+void outputBlockInfo (ProfileData* pd, unsigned int depth, unsigned int totalTime, std::ofstream& file)
+{
+    // Indent
+    for (int i = 0; i < depth; ++i)
+    {
+        file << "- ";
+    }
+    // Output profile information for this block
+    file << pd->name << "," << pd->runTime << "," << pd->runCount << "," <<
+            ((((float)pd->runTime) / ((float)totalTime)) * 100.0f)
+            << "%\n";
+
+    // Output profile information for child blocks
+    for (std::map<std::string, ProfileData*>::iterator it = pd->children.begin(); it != pd->children.end(); it++)
+    {
+        outputBlockInfo((*it).second, depth+1, pd->runTime, file);
+    }
+}
+
 void Profiler::term (const char* filename)
 {
     SDL_DestroyMutex(lock);
 
     std::ofstream file(filename);
+    file << "Name,Time (ms),Count,Run %\n\n";
 
-    file << "Aggregates\n";
-    file << "Code Block Name, Total Run Time, Run Count\n";
-    for (std::map<std::string, ProfileData>::iterator i = blocks.begin(); i != blocks.end(); ++i)
+    for (std::map<SDL_threadID, std::vector<ProfileData*> >::iterator it = roots.begin(); it != roots.end(); it++)
     {
-        ProfileData& pd = (*i).second;
-        file << (*i).first << "," << pd.runTime << "," << pd.runCount << "\n";
-    }
-
-    file << "\nIndividual calls\n";
-    file << "Code Block Name, Call Timestamp, Call Time, Duplicates\n";
-    for (std::map<std::string, ProfileData>::iterator i = blocks.begin(); i != blocks.end(); ++i)
-    {
-        ProfileData& pd = (*i).second;
-        if (pd.runs.size() > 0)
+        file << "Thread " << (*it).first << "\n";
+        std::vector<ProfileData*>& rootList = (*it).second;
+        for (std::vector<ProfileData*>::iterator i = rootList.begin(); i != rootList.end(); i++)
         {
-            for (std::vector<BlockRun>::iterator iter = pd.runs.begin(); iter != pd.runs.end(); ++iter)
-            {
-                file << (*i).first << "," << (*iter).timeStamp << "," << (*iter).runTime << "," << (*iter).duplicates << "\n";
-            }
+            outputBlockInfo(*i, 0, (*i)->runTime, file);
         }
+        file << "\n";
     }
 }

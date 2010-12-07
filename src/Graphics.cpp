@@ -83,7 +83,7 @@ int state = 0;
 
 void Graphics::render ()
 {
-    profile("#Graphics::render");
+    profile("Graphics::render");
 
     unsigned int diff = SDL_GetTicks() - startTime;
 

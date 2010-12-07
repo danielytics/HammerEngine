@@ -11,8 +11,7 @@ int logicThread (void* data)
     volatile bool& running = *((bool*)data); // Should be cached locally (but not in register!) until main thread sets it to false, in which case it is loaded accross the interconnect bus
     while (running)
     {
-        profile("#logicThread/main_loop");
-
+        profile("logicThread");
         // Run controllers
         /*
          Update all "inteligent" agents, that is, the player and AI agents. Controllers should be parallelized.
@@ -45,7 +44,7 @@ int main (int argc, char** argv)
     Profiler::init();
 
     {
-        profile("#main");
+        profile("main");
 
         bool threadInited = false;
         {
@@ -72,58 +71,60 @@ int main (int argc, char** argv)
                 frameTimer = SDL_GetTicks();
 
                 // Run input/rendering loop
-                while (running)
                 {
-                    profile("#main/main_loop");
-
-                    // Get input events.
-                    while(SDL_PollEvent(&event))
+                    profile("main_loop");
+                    while (running)
                     {
-                        profile("#main/event_loop");
-
-                        switch (event.type)
+                        // Get input events.
                         {
-                        case SDL_KEYDOWN:
-                            // Key was pushed
+                            profile("event_loop");
+                            while(SDL_PollEvent(&event))
                             {
-                                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                                switch (event.type)
                                 {
-                                    running = false;
+                                case SDL_KEYDOWN:
+                                    // Key was pushed
+                                    {
+                                        if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                                        {
+                                            running = false;
+                                        }
+                                        /*
+                                        Input events should be translated to commands and dispatched to the Player Controller.
+                                        */
+                                    }
+                                    break;
+                                case SDL_KEYUP:
+                                    // Key was released
+                                    break;
+                                case SDL_WINDOWEVENT:
+                                    // Window event received
+                                    {
+                                        if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+                                        // Window close butten pressed
+                                        {
+                                            running = false;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
                                 }
-                                /*
-                                Input events should be translated to commands and dispatched to the Player Controller.
-                                */
                             }
-                            break;
-                        case SDL_KEYUP:
-                            // Key was released
-                            break;
-                        case SDL_WINDOWEVENT:
-                            // Window event received
-                            {
-                                if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-                                // Window close butten pressed
-                                {
-                                    running = false;
-                                }
-                            }
-                            break;
-                        default:
-                            break;
                         }
-                    }
-                    graphics.render();
+                        graphics.render();
 
-                    // Calculate frame rate (number of "frames" rendered to the screen per second; game logic runs unsynchronized with the renderer)
-                    ++frames;
-                    elapsedTime = SDL_GetTicks() - frameTimer;
-                    if (elapsedTime > FRAMERATE_COUNTER_LATENCY)
-                    {
-                        framerate = (float)(1000 / elapsedTime) * (float)(frames);
-                        frames = 0;
-                        total += framerate;
-                        numFrames++;
-                        frameTimer = SDL_GetTicks();
+                        // Calculate frame rate (number of "frames" rendered to the screen per second; game logic runs unsynchronized with the renderer)
+                        ++frames;
+                        elapsedTime = SDL_GetTicks() - frameTimer;
+                        if (elapsedTime > FRAMERATE_COUNTER_LATENCY)
+                        {
+                            framerate = (float)(1000 / elapsedTime) * (float)(frames);
+                            frames = 0;
+                            total += framerate;
+                            numFrames++;
+                            frameTimer = SDL_GetTicks();
+                        }
                     }
                 }
             }
