@@ -27,11 +27,13 @@ SOURCES += main.cpp \
     Graphics.cpp \
     Info.cpp \
     Logger.cpp \
-    Profiler.cpp
+    Profiler.cpp \
+    ChunkedMemoryPool.cpp
 
 HEADERS += \
     Renderer.h \
     Graphics.h \
     Info.h \
     Logger.h \
-    Profiler.h
+    Profiler.h \
+    ChunkedMemoryPool.h
