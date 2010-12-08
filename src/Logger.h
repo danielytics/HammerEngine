@@ -21,11 +21,11 @@ public:
     Logger();
 
     enum LoggerLevel {
-        INFO=0,
-        WARN,
-        ERROR,
-        FATAL,
-        DEBUG
+        LOG_INFO=0,
+        LOG_WARN,
+        LOG_ERROR,
+        LOG_FATAL,
+        LOG_DEBUG
     };
 
     void write (const LoggerLevel level, const LogStream& stream);

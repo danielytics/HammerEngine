@@ -11,6 +11,7 @@
 
 #endif
 
+class ProfileData;
 class Profiler
 {
     const char* blockName;

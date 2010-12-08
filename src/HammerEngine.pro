@@ -15,10 +15,12 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 
 INCLUDEPATH += ../depends/falcon/include \
                ../depends/SDL-1.3.0/include \
-               ../depends/OpenGL/include
+               ../depends/OpenGL/include \
+               ../depends/ThreadingBuildingBlocks/include
 
 LIBS += -L../depends/falcon/lib/ -lfalcon_engine.dll \
-        -L../depends/SDL-1.3.0/lib -lmingw32 -lSDLmain -lSDL -lopengl32
+        -L../depends/SDL-1.3.0/lib -lmingw32 -lSDLmain -lSDL -lopengl32 \
+        ../bin/tbb.dll
 
 SOURCES += main.cpp \
     Script.cpp \

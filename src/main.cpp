@@ -1,6 +1,8 @@
 
 #include "Graphics.h"
 #include "Profiler.h"
+#include "Info.h"
+#include "Logger.h"
 
 #include <iostream>
 
@@ -8,10 +10,10 @@
 
 int logicThread (void* data)
 {
+    profile("logicThread");
     volatile bool& running = *((bool*)data); // Should be cached locally (but not in register!) until main thread sets it to false, in which case it is loaded accross the interconnect bus
     while (running)
     {
-        profile("logicThread");
         // Run controllers
         /*
          Update all "inteligent" agents, that is, the player and AI agents. Controllers should be parallelized.
@@ -72,6 +74,10 @@ int main (int argc, char** argv)
 
                 // Run input/rendering loop
                 {
+                    Logger logger;
+                    Info info;
+                    info.writeToLog(&logger);
+
                     profile("main_loop");
                     while (running)
                     {
