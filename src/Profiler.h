@@ -11,11 +11,13 @@
 
 #endif
 
+#include <tbb/tick_count.h>
+
 class ProfileData;
 class Profiler
 {
     const char* blockName;
-    unsigned int startTime;
+    tbb::tick_count startTime;
 
 public:
     Profiler (const char* name);

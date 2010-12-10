@@ -20,7 +20,7 @@ INCLUDEPATH += ../depends/falcon/include \
 
 LIBS += -L../depends/falcon/lib/ -lfalcon_engine.dll \
         -L../depends/SDL-1.3.0/lib -lmingw32 -lSDLmain -lSDL -lopengl32 \
-        ../bin/tbb.dll
+        -L../depends/ThreadingBuildingBlocks/lib/ia32 -ltbb ../bin/tbb.dll
 
 SOURCES += main.cpp \
     Script.cpp \
@@ -28,7 +28,10 @@ SOURCES += main.cpp \
     Info.cpp \
     Logger.cpp \
     Profiler.cpp \
-    ChunkedMemoryPool.cpp
+    ChunkedMemoryPool.cpp \
+    Renderer.cpp \
+    logic.cpp \
+    Messenger.cpp
 
 HEADERS += \
     Renderer.h \
@@ -36,4 +39,6 @@ HEADERS += \
     Info.h \
     Logger.h \
     Profiler.h \
-    ChunkedMemoryPool.h
+    ChunkedMemoryPool.h \
+    Renderer.h \
+    Messenger.h

@@ -1,6 +1,7 @@
 #ifndef CHUNKEDMEMORYPOOL_H
 #define CHUNKEDMEMORYPOOL_H
 
+#if 0
 class ChunkedMemoryPool : public MemoryChunkPool
 {
 private:
@@ -70,4 +71,5 @@ public:
       */
     void addWatcher (PoolWatcher* w);
 };
+#endif
 #endif // CHUNKEDMEMORYPOOL_H

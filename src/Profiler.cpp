@@ -27,7 +27,7 @@ struct ProfileData
 {
     ProfileData (const std::string& n) : name(n), runTime(0), runCount(0), parent(0) {}
     const std::string name;
-    unsigned int runTime;
+    double runTime;
     unsigned int runCount;
 
     ProfileData* parent;
@@ -43,7 +43,7 @@ SDL_mutex* lock; // Lock to ensure threads do not corrupt the data, will be unde
 // A profiled code block has been entered
 Profiler::Profiler (const char* name) :
         blockName(name),
-        startTime(SDL_GetTicks())
+        startTime(tbb::tick_count::now())
 {
     SDL_threadID threadID = SDL_ThreadID();
     SDL_mutexP(lock); // Lock
@@ -99,7 +99,7 @@ Profiler::~Profiler ()
 
     // Get the current block for this thread
     ProfileData* pd = current[threadID];
-    pd->runTime += (SDL_GetTicks() - startTime);
+    pd->runTime += (tbb::tick_count::now() - startTime).seconds();
 
     // Switch to parent block
     current[threadID] = pd->parent;
@@ -112,16 +112,16 @@ void Profiler::init ()
     lock = SDL_CreateMutex();
 }
 
-void outputBlockInfo (ProfileData* pd, unsigned int depth, unsigned int totalTime, std::ofstream& file)
+void outputBlockInfo (ProfileData* pd, unsigned int depth, double totalTime, std::ofstream& file)
 {
     // Indent
-    for (int i = 0; i < depth; ++i)
+    for (unsigned int i = 0; i < depth; ++i)
     {
         file << "- ";
     }
     // Output profile information for this block
     file << pd->name << "," << pd->runTime << "," << pd->runCount << "," <<
-            ((((float)pd->runTime) / ((float)totalTime)) * 100.0f)
+            ((pd->runTime / totalTime) * 100.0f)
             << "%\n";
 
     // Output profile information for child blocks
@@ -136,7 +136,7 @@ void Profiler::term (const char* filename)
     SDL_DestroyMutex(lock);
 
     std::ofstream file(filename);
-    file << "Name,Time (ms),Count,Run %\n\n";
+    file << "Name,Time (seconds),Count,Run %\n\n";
 
     for (std::map<SDL_threadID, std::vector<ProfileData*> >::iterator it = roots.begin(); it != roots.end(); it++)
     {

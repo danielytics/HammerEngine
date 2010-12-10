@@ -3,38 +3,13 @@
 #include "Profiler.h"
 #include "Info.h"
 #include "Logger.h"
+#include "Messenger.h"
 
 #include <iostream>
 
 #define FRAMERATE_COUNTER_LATENCY 500
 
-int logicThread (void* data)
-{
-    profile("logicThread");
-    volatile bool& running = *((bool*)data); // Should be cached locally (but not in register!) until main thread sets it to false, in which case it is loaded accross the interconnect bus
-    while (running)
-    {
-        // Run controllers
-        /*
-         Update all "inteligent" agents, that is, the player and AI agents. Controllers should be parallelized.
-         */
-
-        // Run physics
-        /*
-         Update every game object in parallel. This should apply cotnroller actions, physics, collision handling, etc.
-         */
-
-        // Pre-render
-        /*
-         Here we want to basically figure out what needs to be drawn and in what order so it can be pre-sorted before the renderer thread
-         sends it to the graphics card for drawing. We want to do as much of the CPU-bound rendering work as possible here so that
-         it can be parallelized. The renderer thread should then simply walk the sorted render list and send commands to the GPU.
-         */
-        //SDL_Delay(250);
-    }
-
-    return 0;
-}
+int logicThread (void* data);
 
 int main (int argc, char** argv)
 {
@@ -53,7 +28,10 @@ int main (int argc, char** argv)
             Graphics graphics("Norse Game");
 
             bool threadRunning = true; // Running flag shared accross processor cores
-            SDL_Thread* logic = SDL_CreateThread(logicThread, &threadRunning );
+            Messenger messenger(threadRunning);
+            messenger.getAndSetScene(0);
+
+            SDL_Thread* logic = SDL_CreateThread(logicThread, &messenger );
             threadInited = true;
 
             SDL_Event event;
@@ -65,6 +43,9 @@ int main (int argc, char** argv)
             float framerate = 0;
             float total = 0;
             unsigned int numFrames = 0;
+
+            // Pointer to next scene to render.
+            const SceneNode* scene = 0;
 
             try {
                 //graphics.init(512, 512, false);
@@ -118,18 +99,28 @@ int main (int argc, char** argv)
                                 }
                             }
                         }
-                        graphics.render();
-
-                        // Calculate frame rate (number of "frames" rendered to the screen per second; game logic runs unsynchronized with the renderer)
-                        ++frames;
-                        elapsedTime = SDL_GetTicks() - frameTimer;
-                        if (elapsedTime > FRAMERATE_COUNTER_LATENCY)
+                        // Take next scene and give back old scene.
+                        scene = messenger.getAndSetScene(scene);
+                        if (scene != 0)
                         {
-                            framerate = (float)(1000 / elapsedTime) * (float)(frames);
-                            frames = 0;
-                            total += framerate;
-                            numFrames++;
-                            frameTimer = SDL_GetTicks();
+                            graphics.render();
+
+                            // Calculate frame rate (number of "frames" rendered to the screen per second; game logic runs unsynchronized with the renderer)
+                            ++frames;
+                            elapsedTime = SDL_GetTicks() - frameTimer;
+                            if (elapsedTime > FRAMERATE_COUNTER_LATENCY)
+                            {
+                                framerate = (float)(1000 / elapsedTime) * (float)(frames);
+                                frames = 0;
+                                total += framerate;
+                                numFrames++;
+                                frameTimer = SDL_GetTicks();
+                            }
+                        }
+                        else
+                        {
+                            // If no scene to render, give other threads more time.
+                            SDL_Delay(1);
                         }
                     }
                 }
@@ -142,8 +133,14 @@ int main (int argc, char** argv)
             // Terminate logic thread
             if (threadInited)
             {
+                // Shut down logic threrad.
                 threadRunning  = false; // Share running flag accross interconnect to other thread
                 int status;
+                while ((scene = messenger.getAndSetScene(scene)) != 0)
+                {
+                    SDL_Delay(1); // Give the logic thread time to release scene.
+                }
+
                 SDL_WaitThread(logic, &status);
             }
 
