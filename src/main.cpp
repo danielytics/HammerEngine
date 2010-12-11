@@ -21,11 +21,15 @@ int main (int argc, char** argv)
         return -1;
     }
     Profiler::init();
+    Vector::init();
 
     Vector v1(3.0f, 4.0f, 0.0f, 0.0f);
     Vector v2(1.0f, 0.0f, 0.0f, 0.0f);
     Vector v3(1.0f, 1.0f, 1.0f, 0.0f);
     Vector v4(0.0f, 0.0f, 4.0f, 3.0f);
+
+    v1.dotProduct(v2);
+
     std::cout << "v1.length() = " << v1.length() << "\n";
     std::cout << "v2.length() = " << v2.length() << "\n";
     std::cout << "v3.length() = " << v3.length() << "\n";

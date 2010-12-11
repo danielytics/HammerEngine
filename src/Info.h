@@ -7,15 +7,17 @@ class Info
 {
 private:
     int numProcessors;
+    bool flagMMX, flag3DNow, flagSSE, flagSSE2, flagSSE3;
 
 public:
     Info();
 
-    int numberOfProcessors () const;
-    bool hasMMX () const;
-    bool has3DNow () const;
-    bool hasSSE () const;
-    bool hasSSE2 () const;
+    inline int numberOfProcessors () const  {return numProcessors;}
+    inline bool hasMMX () const             {return flagMMX;}
+    inline bool has3DNow () const           {return flag3DNow;}
+    inline bool hasSSE () const             {return flagSSE;}
+    inline bool hasSSE2 () const            {return flagSSE2;}
+    inline bool hasSSE3 () const            {return flagSSE3;}
 
     void writeToLog (Logger* logger) const;
 };

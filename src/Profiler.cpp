@@ -112,7 +112,7 @@ void Profiler::init ()
     lock = SDL_CreateMutex();
 }
 
-void outputBlockInfo (ProfileData* pd, unsigned int depth, double totalTime, std::ofstream& file)
+void outputBlockInfo (ProfileData* __restrict__ pd, const unsigned int depth, const double totalTime, std::ofstream& file)
 {
     // Indent
     for (unsigned int i = 0; i < depth; ++i)

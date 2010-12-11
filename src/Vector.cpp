@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include "Info.h"
 
 #define X 0
 #define Y 1
@@ -35,7 +36,7 @@ Vector::Vector (const Vector& other)
 #include <cmath>
 #include <iostream>
 
-float Vector::length ()
+float Vector::length () const
 {   // result = sqrt(sqr(cX) + sqr(cY) + sqr(cZ) + sqr(cW))
 
     // Square the vectors components, x,y,z,w = sqr(cX),sqr(cY),sqr(cZ),sqr(cW)
@@ -70,6 +71,26 @@ void Vector::normalize ()
     components = _mm_mul_ps(components, shuffleTo(reciprocalLength, X));
 }
 
+// Calculate the dot product of the vector; if the dot product of multiple vectors needs to be found, use Vector::dotProduct(v1,v2,v3,v4) instead for ~4x speedup
+float Vector::dotProduct_SSE2 (const Vector& other) const
+{
+    std::cout << "SSE2 dot product\n";
+    return 0;
+}
+
+#ifdef __SSE3__
+float Vector::dotProduct_SSE3 (const Vector& other) const
+{
+    std::cout << "SSE3 dot product\n";
+    float4 temp1 = _mm_mul_ps(components, other.components);
+    float4 temp2 = _mm_hadd_ps(temp1, temp1);
+    float4 temp3 = _mm_hadd_ps(temp2, temp2);
+    float result;
+    _mm_store_ss(&result, temp3);
+    return result;
+}
+#endif
+
 // Normalize four vectors at once
 void Vector::normalize (Vector& v1, Vector& v2, Vector& v3, Vector& v4)
 {   // Multiply components by reciprocal square root of the sum of squares of components
@@ -100,4 +121,22 @@ void Vector::normalize (Vector& v1, Vector& v2, Vector& v3, Vector& v4)
     v2.components = _mm_mul_ps(v2.components, shuffleTo(rsrt, Y));
     v3.components = _mm_mul_ps(v3.components, shuffleTo(rsrt, Z));
     v4.components = _mm_mul_ps(v4.components, shuffleTo(rsrt, W));
+}
+
+FPTR_DotProduct Vector::fptr_dotProduct = 0;
+void Vector::init ()
+{
+    Info info;
+#ifdef __SSE3__
+    // If we have SSE3 available, use SSE3 optimized functions
+    if (info.hasSSE3())
+    {
+        fptr_dotProduct = &Vector::dotProduct_SSE3;
+    }
+    // Otherwise fall back to SSE2
+    else
+#endif
+    {
+        fptr_dotProduct = &Vector::dotProduct_SSE2;
+    }
 }

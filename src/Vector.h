@@ -1,11 +1,19 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-// SSE and SSE2 intrinsics
-#include <xmmintrin.h>
+// SSE, SSE2 and SSE3 intrinsics
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#define WITH_SSE3(x) x
+#else
 #include <emmintrin.h>
+#define WITH_SSE3(x)
+#endif
+
+class Vector;
 
 typedef __m128 float4;
+typedef float (Vector::*FPTR_DotProduct) (const Vector& other) const;
 
 class Vector
 {
@@ -20,6 +28,10 @@ private:
         };
     };
 
+    float dotProduct_SSE2 (const Vector& other) const;
+    WITH_SSE3(float dotProduct_SSE3 (const Vector& other) const);
+    static FPTR_DotProduct fptr_dotProduct;
+
 public:
     Vector ();
     Vector (const float x, const float y=0, const float z=0, const float w=0);
@@ -33,14 +45,21 @@ public:
     inline float w () const {return cZ;}
 
     // Find the vectors modulus
-    float length ();
+    float length () const;
 
     // Normalize vector
     void normalize ();
 
+    // Dot product
+    inline float dotProduct (const Vector& other) const {return (this->*fptr_dotProduct)(other);}
+
+    /** Vectorized versions which operate on four vectors at one: */
+
     // Normalize four vectors
     static void normalize (Vector& v1, Vector& v2, Vector& v3, Vector& v4);
 
+
+    static void init ();
 };
 
 #endif // VECTOR_H
