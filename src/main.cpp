@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "Vector.h"
+
 #define FRAMERATE_COUNTER_LATENCY 500
 
 int logicThread (void* data);
@@ -19,6 +21,22 @@ int main (int argc, char** argv)
         return -1;
     }
     Profiler::init();
+
+    Vector v1(3.0f, 4.0f, 0.0f, 0.0f);
+    Vector v2(1.0f, 0.0f, 0.0f, 0.0f);
+    Vector v3(1.0f, 1.0f, 1.0f, 0.0f);
+    Vector v4(0.0f, 0.0f, 4.0f, 3.0f);
+    std::cout << "v1.length() = " << v1.length() << "\n";
+    std::cout << "v2.length() = " << v2.length() << "\n";
+    std::cout << "v3.length() = " << v3.length() << "\n";
+    std::cout << "v4.length() = " << v4.length() << "\n";
+
+    Vector::normalize(v1, v2, v3, v4);
+    std::cout << "\n";
+    std::cout << "v1.length() = " << v1.length() << "\n";
+    std::cout << "v2.length() = " << v2.length() << "\n";
+    std::cout << "v3.length() = " << v3.length() << "\n";
+    std::cout << "v4.length() = " << v4.length() << "\n";
 
     {
         profile("main");

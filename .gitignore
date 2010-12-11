@@ -4,3 +4,5 @@ depends/SDL-1.3.0/build
 bin/*.exe
 performance_profile.csv
 *.*~
+src/object_script.HammerEngine.*
+src/Makefile*
