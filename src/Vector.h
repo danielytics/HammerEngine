@@ -12,21 +12,24 @@
 
 class Vector;
 
-typedef __m128 float4;
+typedef __m128 vec4f;
+struct __attribute__((packed, aligned(16))) float4
+{
+    float x, y, z, w;
+};
+
 typedef float (Vector::*FPTR_DotProduct) (const Vector& other) const;
+
+#define float4_x(f4) (((float *)&(f4))[0])
+#define float4_y(f4) (((float *)&(f4))[1])
+#define float4_z(f4) (((float *)&(f4))[2])
+#define float4_w(f4) (((float *)&(f4))[3])
 
 class Vector
 {
 private:
-    // All vectors are treated as 4D vectors
-    union
-    {
-        float4 components;
-        struct
-        {
-            float cX, cY, cZ, cW;
-        };
-    };
+    // vec4f vectors are treated as 4D vectors
+    float4 components;
 
     float dotProduct_SSE2 (const Vector& other) const;
     WITH_SSE3(float dotProduct_SSE3 (const Vector& other) const);
@@ -35,14 +38,14 @@ private:
 public:
     Vector ();
     Vector (const float x, const float y=0, const float z=0, const float w=0);
-    Vector (const float4 vec);
+    Vector (const vec4f vec);
     Vector (const Vector& other);
 
     // Get vector components
-    inline float x () const {return cX;}
-    inline float y () const {return cX;}
-    inline float z () const {return cY;}
-    inline float w () const {return cZ;}
+    inline float x () const {return float4_x(components);}
+    inline float y () const {return float4_y(components);}
+    inline float z () const {return float4_z(components);}
+    inline float w () const {return float4_w(components);}
 
     // Find the vectors modulus
     float length () const;

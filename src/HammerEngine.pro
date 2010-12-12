@@ -10,7 +10,7 @@ DESTDIR = ../bin/
 CONFIG += console
 CONFIG   -= app_bundle
 TEMPLATE = app
-QMAKE_CXXFLAGS_RELEASE += -O3 -mmmx -msse -msse2 -msse3 -mfpmath=sse -ftree-vectorize
+QMAKE_CXXFLAGS_RELEASE += -O3 -mmmx -msse -msse2 -msse3 -mfpmath=sse -ftree-vectorize -ffast-math
 #-ftree-vectorizer-verbose=2 -DPROFILER_ENABLED
 QMAKE_CXXFLAGS_RELEASE -= -O2
 
@@ -44,4 +44,5 @@ HEADERS += \
     ChunkedMemoryPool.h \
     Renderer.h \
     Messenger.h \
-    Vector.h
+    Vector.h \
+    Pooled.h
