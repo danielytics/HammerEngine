@@ -8,14 +8,14 @@ class SceneNode;
 class Messenger
 {
 private:
-    bool& runningFlag;
+    bool* runningFlag;
 
     tbb::atomic<const SceneNode*> sceneToRender;
 
 public:
-    Messenger (bool& r);
+    Messenger (bool* r);
 
-    bool& running ();
+    bool* running ();
 
     inline const SceneNode* getAndSetScene (const SceneNode* sn)
     {

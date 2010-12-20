@@ -33,7 +33,8 @@ SOURCES += main.cpp \
     Renderer.cpp \
     logic.cpp \
     Messenger.cpp \
-    Vector.cpp
+    Vector.cpp \
+    PipelineProcessor.cpp
 
 HEADERS += \
     Renderer.h \
@@ -45,4 +46,5 @@ HEADERS += \
     Renderer.h \
     Messenger.h \
     Vector.h \
-    Pooled.h
+    Pooled.h \
+    PipelineProcessor.h

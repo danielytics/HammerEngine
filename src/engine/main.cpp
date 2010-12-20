@@ -49,8 +49,8 @@ int main (int argc, char** argv)
         {
             Graphics graphics("Norse Game");
 
-            bool threadRunning = true; // Running flag shared accross processor cores
-            Messenger messenger(threadRunning);
+            volatile bool threadRunning = true; // Running flag shared accross processor cores
+            Messenger messenger(&threadRunning);
             messenger.getAndSetScene(0);
 
             SDL_Thread* logic = SDL_CreateThread(logicThread, &messenger );
@@ -156,7 +156,9 @@ int main (int argc, char** argv)
             if (threadInited)
             {
                 // Shut down logic threrad.
+                // TODO: do I need to insert an lfence here??
                 threadRunning  = false; // Share running flag accross interconnect to other thread
+                // TODO: do I need to insert an sfence here??
                 int status;
                 while ((scene = messenger.getAndSetScene(scene)) != 0)
                 {

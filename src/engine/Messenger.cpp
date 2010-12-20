@@ -1,11 +1,11 @@
 #include "Messenger.h"
 
-Messenger::Messenger (bool& r) :
+Messenger::Messenger (bool* r) :
         runningFlag(r)
 {
 }
 
-bool& Messenger::running ()
+bool* Messenger::running ()
 {
     return runningFlag;
 }

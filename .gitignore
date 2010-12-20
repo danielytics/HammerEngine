@@ -1,8 +1,11 @@
-src/debug
-src/release
-depends/SDL-1.3.0/build
+src/engine/debug
+src/engine/release
+src/depends/SDL-1.3.0/build
 bin/*.exe
+modules/*.dll
 performance_profile.csv
 *.*~
-src/object_script.HammerEngine.*
-src/Makefile*
+src/engine/object_script.HammerEngine.*
+Makefile*
+src/modules/core/debug
+src/modules/core/release
