@@ -12,7 +12,7 @@
 
 #define GV_FOREACH(op)  T temp;\
                         for (unsigned int index = 0; index < N; ++index) {\
-                            temp.vectors[index] = vectors[index] op other.vectors[index];\
+                            temp.vectors[index] = op(vectors[index], other.vectors[index]);\
                         } return temp
 
 /**
@@ -38,17 +38,17 @@ public:
 
     T operator+ (const T& other) const
     {
-        GV_FOREACH(+);
+        GV_FOREACH(Packed::add);
     }
 
     T operator- (const T& other) const
     {
-        GV_FOREACH(-);
+        GV_FOREACH(Packed::sub);
     }
 
     T operator* (const T& other) const
     {
-        GV_FOREACH(*);
+        GV_FOREACH(Packed::mul);
     }
 
     static const unsigned int stream_size = N;
