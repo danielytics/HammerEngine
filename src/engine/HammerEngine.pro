@@ -6,7 +6,7 @@
 
 QT       -= core gui
 TARGET = HammerEngine
-DESTDIR = ../bin/
+DESTDIR = ../../bin/
 CONFIG += console
 CONFIG   -= app_bundle
 TEMPLATE = app
@@ -17,11 +17,12 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 INCLUDEPATH += ../depends/falcon/include \
                ../depends/SDL-1.3.0/include \
                ../depends/OpenGL/include \
-               ../depends/ThreadingBuildingBlocks/include
+               ../depends/ThreadingBuildingBlocks/include \
+               ../../sdk/include
 
 LIBS += -L../depends/falcon/lib/ -lfalcon_engine.dll \
         -L../depends/SDL-1.3.0/lib -lmingw32 -lSDLmain -lSDL -lopengl32 \
-        ../bin/tbb.dll
+        ../../bin/tbb.dll
 
 SOURCES += main.cpp \
     Script.cpp \
@@ -34,7 +35,8 @@ SOURCES += main.cpp \
     logic.cpp \
     Messenger.cpp \
     Vector.cpp \
-    PipelineProcessor.cpp
+    PipelineProcessor.cpp \
+    EntitySystem/EntitySystem.cpp
 
 HEADERS += \
     Renderer.h \
@@ -47,4 +49,31 @@ HEADERS += \
     Messenger.h \
     Vector.h \
     Pooled.h \
-    PipelineProcessor.h
+    PipelineProcessor.h \
+    EntitySystem.h \
+    EntitySystem/Trait.h \
+    EntitySystem/EntitySystem.h \
+    ../../sdk/include/HammerEngine/EntitySystem/Trait.h \
+    ../../sdk/include/HammerEngine/EntitySystem/EntitySystem.h \
+    ../../sdk/include/HammerEngine/EntitySystem/Entity.h \
+    ../../sdk/include/HammerEngine/Module.h \
+    Resource/Resource.h \
+    ../../sdk/include/HammerEngine/Types/Vector.h \
+    ../../sdk/include/HammerEngine/Types/Texture.h \
+    ../../sdk/include/HammerEngine/Types/Ray.h \
+    ../../sdk/include/HammerEngine/Types/Polygon.h \
+    ../../sdk/include/HammerEngine/Types/Polar3D.h \
+    ../../sdk/include/HammerEngine/Types/Polar2D.h \
+    ../../sdk/include/HammerEngine/Types/Plane.h \
+    ../../sdk/include/HammerEngine/Types/Line.h \
+    ../../sdk/include/HammerEngine/Types/Color4.h \
+    ../../sdk/include/HammerEngine/Types/Color.h \
+    ../../sdk/include/HammerEngine/Types/AABB.h \
+    ../../sdk/include/HammerEngine/SIMD/Packed.h \
+    ../../sdk/include/HammerEngine/SIMD/GenericVector.h \
+    ../../sdk/include/HammerEngine/Types/Matrix4x4.h \
+    ../../sdk/include/HammerEngine/Types/Matrix3x3.h \
+    ../../sdk/include/HammerEngine/Types/Matrix2x2.h \
+    ../../sdk/include/HammerEngine/Resources/Handle.h \
+    ../../sdk/include/HammerEngine/Memory/StreamPool.h \
+    ../../sdk/include/HammerEngine/EntitySystem/BehaviorFunctor.h

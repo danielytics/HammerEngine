@@ -9,3 +9,4 @@ src/engine/object_script.HammerEngine.*
 Makefile*
 src/modules/core/debug
 src/modules/core/release
+*.pro.user
