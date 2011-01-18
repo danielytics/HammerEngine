@@ -36,17 +36,17 @@ public:
     GenericVector () {}
     virtual ~GenericVector () {}
 
-    T operator+ (const T& other) const
+    inline T operator+ (const T& other) const
     {
         GV_FOREACH(Packed::add);
     }
 
-    T operator- (const T& other) const
+    inline T operator- (const T& other) const
     {
         GV_FOREACH(Packed::sub);
     }
 
-    T operator* (const T& other) const
+    inline T operator* (const T& other) const
     {
         GV_FOREACH(Packed::mul);
     }

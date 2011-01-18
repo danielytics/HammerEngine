@@ -31,6 +31,21 @@ public:
     Packed& b () {
         return get(B);
     }
+
+    // Clamp each component to the [0,1] range.
+    void clamp ()
+    {
+        Packed& red   = get(R);
+        Packed& green = get(G);
+        Packed& blue  = get(B);
+
+        Packed zero(0.0f, 0.0f, 0.0f, 0.0f);
+        Packed ones(1.0f, 1.0f, 1.0f, 1.0f);
+
+        red = Packed::max(zeros, Packed::min(red, ones));
+        green = Packed::max(zeros, Packed::min(green, ones));
+        blue = Packed::max(zeros, Packed::min(blue, ones));
+    }
 };
 
 #endif // HAMMER_ENGINE_COLOR__H_

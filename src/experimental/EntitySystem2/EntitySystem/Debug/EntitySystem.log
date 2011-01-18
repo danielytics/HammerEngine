@@ -1,0 +1,9 @@
+﻿Build started 18/01/2011 01:11:46.
+     1>Project "C:\Qt\Projects\EntitySystem2\EntitySystem\EntitySystem.vcxproj" on node 2 (clean target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\EntitySystem.lastbuildstate".
+     1>Done Building Project "C:\Qt\Projects\EntitySystem2\EntitySystem\EntitySystem.vcxproj" (clean target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.11
