@@ -71,24 +71,24 @@ void do_position_system (const Trait& inTrait1, const Trait& inTrait2, Trait& ou
     newPosition = position() + (movement.heading() * movement.speed());
 }
 
+void do_position_behavior (const Position& position, const Movement& movement, Position& out)
+{
+    out = position() + (movement.heading() * movement.speed());
+}
+
+#include <HammerEngine/Module.h>
 
 int main ()
 {
     EntitySystem entitySystem;
+    Hammer::Engine* engine = 0;
 
     Entity player = entitySystem.createEntity()
                         .addTrait<Position>()
-                        .addTrait<Drawable>()
-                        .addTrait<InputController>();
+                        .addTrait<Drawable>();
 
-    EntityTemplate character = entitySystem.createEntityTemplate()
-                                .addTrait<Position>()
-                                .addTrait<Drawable>();
-
-    Entity enemy = character.createEntity()
-                        .addTrait<AIController>();
-
-    entitySystem.registerSystem(Position::id, Movement::id, do_position_system);
+    Hammer::BehaviorBuilder builder(engine);
+    builder.registerBehavior(do_position_behavior);
 
     player<Position>() = Vector(0.0f, 0.0f, 0.0f);
 }

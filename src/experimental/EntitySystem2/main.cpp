@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
         {
             Entity player = hammerEngine.createEntity()
                                 .addTrait<Position>()
-                                .addTrait<Movement>()
-                                .addTrait<Observed>();
+                                .addTrait<Movement>();
+//                                .addTrait<Observed>();
             PositionUtils::init(player.trait<Position>(), 0.0f, 0.0f, 1.0f);
             MovementUtils::init(player.trait<Movement>(), 0.0f, 1.0f, 0.0f);
             player.setState(Running);
@@ -40,41 +40,41 @@ int main(int argc, char *argv[])
         {
             Entity enemy = hammerEngine.createEntity()
                                 .addTrait<Position>()
-                                .addTrait<Movement>()
-                                .addTrait<Observed>();
+                                .addTrait<Movement>();
+//                                .addTrait<Observed>();
             PositionUtils::init(enemy.trait<Position>(), 0.0f, 0.0f, 2.0f);
             MovementUtils::init(enemy.trait<Movement>(), 1.0f, 0.0f, 0.0f);
             enemy.setState(Running);
             std::cout << enemy.id << "\n";
         }
-//        {
-//            Entity enemy = hammerEngine.createEntity()
-//                                .addTrait<Position>()
-//                                .addTrait<Movement>()
+        {
+            Entity enemy = hammerEngine.createEntity()
+                                .addTrait<Position>()
+                                .addTrait<Movement>();
 //                                .addTrait<Observed>();
-//            PositionUtils::init(enemy.trait<Position>(), 0.0f, 0.0f, 3.0f);
-//            MovementUtils::init(enemy.trait<Movement>(), 1.0f, 0.0f, 0.0f);
-//            enemy.setState(Running);
-//        }
+            PositionUtils::init(enemy.trait<Position>(), 0.0f, 0.0f, 3.0f);
+            MovementUtils::init(enemy.trait<Movement>(), 1.0f, 0.0f, 0.0f);
+            enemy.setState(Running);
+        }
 
-//        unsigned int last=0;
-//        for (unsigned int i = 0; i < 10; i++) {
-//            Entity unobserved = hammerEngine.createEntity()
-//                                    .addTrait<Position>()
-//                                    .addTrait<Movement>();
-////                                    .addTrait<Observed>()
-//            unobserved.trait<Movement>().x = 1.0f;
-//            unobserved.setState(Running);
-//            last = unobserved.id;
-//        }
+        unsigned int last=0;
+        for (unsigned int i = 0; i < 1000; i++) {
+            Entity unobserved = hammerEngine.createEntity()
+                                    .addTrait<Position>()
+                                    .addTrait<Movement>();
+            PositionUtils::init(unobserved.trait<Position>(), 0.0f, 0.0f, 0.0f);
+            MovementUtils::init(unobserved.trait<Movement>(), 0.0f, 0.0f, -1.0f);
+            unobserved.setState(Running);
+            last = unobserved.id;
+        }
 
         // Update the system a few times.
-        for (unsigned int i = 0; i < 5; ++i)
+        for (unsigned int i = 0; i < 100; ++i)
         {
             hammerEngine.updateBehavior();
         }
 
-//        std::cout << "Last unobserved entity: " << Entity(hammerEngine, last).trait<Position>() << "\n";
+        std::cout << "Last unobserved entity: " << Entity(hammerEngine, last).trait<Position>() << "\n";
     }
     catch (std::exception& error)
     {

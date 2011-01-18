@@ -13,6 +13,7 @@ TEMPLATE = app
 QMAKE_CXXFLAGS_RELEASE += -O3 -mmmx -msse -msse2 -msse3 -mfpmath=sse -ftree-vectorize -ffast-math
 #-ftree-vectorizer-verbose=2 -DPROFILER_ENABLED
 QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS_DEBUG += -mmmx -msse -msse2 -msse3 -mfpmath=sse
 
 INCLUDEPATH += ../depends/falcon/include \
                ../depends/SDL-1.3.0/include \

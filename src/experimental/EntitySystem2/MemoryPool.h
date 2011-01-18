@@ -1,14 +1,6 @@
 #ifndef MEMORYPOOL_H
 #define MEMORYPOOL_H
 
-//class MemoryPool
-//{
-//public:
-//    virtual ~MemoryPool () {}
-//    virtual void* request () = 0;
-//    virtual void release (void*) = 0;
-//};
-
 #include "DebugTools.h"
 #include "TemplateTools.h"
 template <int Size> struct CalculateObjectSize

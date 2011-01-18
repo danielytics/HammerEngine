@@ -5,6 +5,8 @@
 #include <unordered_map>
 
 #include "EntitySystem.h"
+#include "UnalignedMemoryPool.h"
+#include "Entity.h"
 
 class TraitFactory;
 class BehaviorFunctor;
@@ -12,7 +14,7 @@ class BehaviorFunctor;
 class HammerEntitySystem : public EntitySystem
 {
 private:
-    unsigned int next_id;
+    CreateMemoryPool<UnalignedMemoryPool, MemoryFeatures::DefaultDynamicPoolFeatures, Entity>::Type entityPool;
 
     std::unordered_map<unsigned int, TraitFactory*> traitRegistrar;
     std::unordered_map<const AbstractTrait*, Entity*> traitToEntityMap;

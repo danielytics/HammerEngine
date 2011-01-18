@@ -3,120 +3,23 @@
 
 #include "HammerEntitySystem.h"
 #include "TraitBuilder.h"
-#include "Entity.h"
 #include "BehaviorFunctor.h"
 
 #include "DebugTools.h"
 
 #include <iostream>
 
-//#include "MemoryPool.h"
+struct EntityConstructor
+{
+    EntitySystem* thisPtr;
+    unsigned int id;
+    inline Entity* construct (char* buffer)
+    {
+        return new (buffer) Entity(*thisPtr, id);
+    }
+};
 
-//class CacheAlignedChunkedMemoryPool : public MemoryPool
-//{
-//private:
-//    const unsigned int elementSize;
-//    const unsigned int elementsPerBlock;
-//    const unsigned int blockSize;
-
-//    struct Block
-//    {
-//        Block* next;
-//        char* elements;
-//        // Memory for elements is placed after the struct...
-//    };
-
-//    Block* blockList;
-//    Block* lastBlock;
-//    char* freeList;
-
-//    void initBlock (Block* block)
-//    {
-//        block->next = 0;
-//        block->elements = reinterpret_cast<char*>(block) + sizeof(Block);
-
-//        // Get the first element in the block
-//        char* ptr = deref(block)->elements;
-
-//        // Set the last link to point to null
-//        *reinterpret_cast<char**>(ptr + blockSize  - elementSize) = 0;
-
-//        // For a block to be inited, freeList must be empty, so set the new block as the freeList
-//        freeList = ptr;
-
-//        // Set every other link to point to the next element in the chain
-//        for (unsigned int i = elementsPerBlock - 1; i; --i)
-//        {
-//            char* next = ptr + elementSize;
-//            *deref(reinterpret_cast<char**>(ptr)) = next;
-//            ptr = next;
-//        }
-//    }
-
-//    void allocateBlock ()
-//    {
-//        lastBlock->next = reinterpret_cast<Block*>(new char[blockSize + sizeof(Block)]);
-//        lastBlock = lastBlock->next;
-//        initBlock(lastBlock);
-//    }
-
-//public:
-//    CacheAlignedChunkedMemoryPool (unsigned int es, unsigned int bs)
-//        : elementSize(es)
-//        , elementsPerBlock(bs)
-//        , blockSize(es * bs)
-//    {
-//        lastBlock = reinterpret_cast<Block*>(new char[blockSize + sizeof(Block)]);
-//        blockList = lastBlock;
-//        initBlock(lastBlock);
-//    }
-//    virtual ~CacheAlignedChunkedMemoryPool ()
-//    {
-//        while (blockList != 0)
-//        {
-//            lastBlock = blockList->next;
-//            delete [] reinterpret_cast<char*>(blockList);
-//            blockList = lastBlock;
-//        }
-//    }
-
-//    void* request ()
-//    {
-//        if (freeList == 0)
-//        {
-//            allocateBlock();
-//        }
-//        void* buffer = reinterpret_cast<void*>(freeList);
-//        freeList = *deref(reinterpret_cast<char**>(freeList));
-//        return buffer;
-//    }
-
-//    void release (void* addr)
-//    {
-//        if (addr < freeList || freeList == 0)
-//        {
-//            *deref(reinterpret_cast<char**>(addr)) = freeList;
-//            freeList = reinterpret_cast<char*>(addr);
-//        } else
-//        {
-//            char* current = freeList;
-//            char* next = *deref(reinterpret_cast<char**>(freeList));
-//            while (next != 0)
-//            {
-//                if (addr < next) break;
-//                current = next;
-//                next = *deref(reinterpret_cast<char**>(next + elementSize));
-//            }
-
-//            *reinterpret_cast<char**>(current) = reinterpret_cast<char*>(addr);
-//            *reinterpret_cast<char**>(addr) = next;
-//        }
-//    }
-//};
-
-
-HammerEntitySystem::HammerEntitySystem () :
-        next_id(0)
+HammerEntitySystem::HammerEntitySystem ()
 {
     invalidEntity = new Entity(*this, (unsigned int)-1);
 }
@@ -125,7 +28,7 @@ HammerEntitySystem::~HammerEntitySystem ()
 {
     for (std::vector<Entity*>::iterator iter = entityList.begin(); iter != entityList.end(); ++iter)
     {
-        delete *iter;
+        entityPool.release(*iter);
     }
     // TODO: delete traits
 }
@@ -133,7 +36,11 @@ HammerEntitySystem::~HammerEntitySystem ()
 // Entity API
 Entity& HammerEntitySystem::createEntity ()
 {
-    Entity* entity = new Entity(*this, entityList.size()); // TODO: Memory pool
+    EntityConstructor ctor;
+    ctor.thisPtr = this;
+    ctor.id = entityList.size();
+//    Entity* entity = new Entity(*this, entityList.size()); // TODO: Memory pool
+    Entity* entity = entityPool.request<EntityConstructor>(ctor);
     entityList.push_back(entity);
     return *deref(entity);
 }

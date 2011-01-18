@@ -35,4 +35,6 @@ HEADERS += \
     MemoryPool.h \
     DebugTools.h \
     TemplateTools.h \
-    AlignedMemoryPool.h
+    AlignedMemoryPool.h \
+    BlockMemoryPoolImpl.h \
+    UnalignedMemoryPool.h

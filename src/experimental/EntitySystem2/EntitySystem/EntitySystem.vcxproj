@@ -98,6 +98,7 @@
     <ClInclude Include="..\Trait.h" />
     <ClInclude Include="..\TraitBuilder.h" />
     <ClInclude Include="..\TypeConstraints.h" />
+    <ClInclude Include="..\UnalignedMemoryPool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\HammerEntitySystem.cpp" />

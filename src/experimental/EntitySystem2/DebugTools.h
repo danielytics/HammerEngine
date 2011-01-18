@@ -10,6 +10,7 @@
 // Runtime assertion
 #include <cassert>
 #include <assert.h>
+
 // Static (compile time) assertion
 //#define static_assert(pred) switch(0){case 0:case pred:;}
 template<int,typename MSG> struct static_assert_type { enum { Value}; typedef int Type;};

@@ -63,6 +63,9 @@
     <ClInclude Include="..\TemplateTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\UnalignedMemoryPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\HammerEntitySystem.cpp">

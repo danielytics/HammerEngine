@@ -1,16 +1,22 @@
-#ifndef STATICMEMORYPOOL_H
-#define STATICMEMORYPOOL_H
+#ifndef ALIGNEDMEMORYPOOL_H
+#define ALIGNEDMEMORYPOOL_H
 
 #include "DebugTools.h"
 #include "MemoryPool.h"
+#include "BlockMemoryPoolImpl.h"
 
-#include <stdexcept>
+#include <typeinfo>
 
 template <class Feature, class Object, int PoolSize> class AlignedMemoryPool : invalid_template(Feature, Attempted_to_instantiate_AlignedMemoryPool_with_unsupported_feature)
 {
     // AlignedMemoryPool with invalid Features, if a template evaluates to this, a compile error is produced
 };
 
+/**
+  * Static AlignedMemoryPool
+  * A memory pool whose objects are aligned to a 16-byte boundary, which is a static size.
+  * Throws an exception if an object is requested when all objects in the pool are used.
+  */
 template <class Object, int PoolSize> class AlignedMemoryPool<MemoryFeatures::StaticPool<PoolSize>, Object, PoolSize>
 {
 private:
@@ -23,19 +29,20 @@ private:
     BlockObject objects[PoolSize]; // Static array of objects
     BlockObject* freeList;
 
+    struct StandardCtor
+    {
+        inline Object* construct (char* buffer)
+        {
+            return new (buffer) Object();
+        }
+    };
+    StandardCtor standardCtor;
+
 public:
     AlignedMemoryPool ()
     {
-        // Initialize the pool for use
-        const unsigned int maxIndex = PoolSize - 1;
-        objects[maxIndex].nextUnused = 0;
-        for (unsigned int index = 0; index < maxIndex; ++index)
-        {
-            assert(index < PoolSize);
-            objects[index].nextUnused = &objects[index + 1];
-        }
         // Point freeList at the first object
-        freeList = objects;
+        freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, PoolSize>(objects);
     }
 
     ~AlignedMemoryPool ()
@@ -43,7 +50,7 @@ public:
 
     }
 
-    Object* request ()
+    template <class Ctor> Object* request (Ctor& ctor)
     {
         if (!freeList)
         {
@@ -53,22 +60,24 @@ public:
             sstr << "Static AlignedMemoryPool is out of objects of type " << typeid(Object).name();
             throw std::runtime_error(sstr.str());
         }
-        BlockObject* object = freeList;
-        assert(object != 0);
-        freeList = object->nextUnused;
-        return new (object->buffer) Object();
+        return BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+    }
+
+    Object* request ()
+    {
+        return request<StandardCtor>(standardCtor);
     }
 
     void release (Object* pointer)
     {
-        assert(pointer != 0);
-        pointer->~Object();
-        BlockObject* object = reinterpret_cast<BlockObject*>(pointer);
-        object->nextUnused = freeList;
-        freeList = object;
+        BlockMemoryPoolImplementation::setObjectUnused<BlockObject, Object>(freeList, pointer);
     }
 };
 
+/**
+  * Dynamic AlignedMemoryPool
+  * A memory pool whose objects are aligned to a 16-byte boundary, which dynamically grows to fit requested objects.
+  */
 template <class Object, int PoolSize> class AlignedMemoryPool<MemoryFeatures::DynamicPool<PoolSize>, Object, PoolSize>
 {
 private:
@@ -88,26 +97,21 @@ private:
     Block* root;
     BlockObject* freeList;
 
-    Block* initBlock (Block* block)
+    struct StandardCtor
     {
-        assert(block != 0);
-        const unsigned int maxIndex = BlockSize - 1;
-        block->objects[maxIndex].nextUnused = 0;
-        for (unsigned int index = 0; index < maxIndex; ++index)
+        inline Object* construct (char* buffer)
         {
-            assert(index < BlockSize);
-            block->objects[index].nextUnused = &block->objects[index + 1];
+            return new (buffer) Object();
         }
-        return block;
-    }
-
+    };
+    StandardCtor standardCtor;
 
 public:
     AlignedMemoryPool ()
-        : root(initBlock(&staticBlock)) // First block is statically allocated
-        , freeList(staticBlock.objects)
+        : root(&staticBlock) // First block is statically allocated
+        , freeList(BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(staticBlock.objects))
     {
-
+        staticBlock.next = 0;
     }
 
     ~AlignedMemoryPool ()
@@ -122,29 +126,28 @@ public:
         }
     }
 
-    Object* request ()
+    template <class Ctor> inline Object* request (Ctor& ctor)
     {
         if (!freeList)
         {
             // There are no more free objects in the pool, allocate more.
-            Block* block = initBlock(new Block);
+            Block* block = new Block;
             block->next = root;
-            freeList = block->objects;
+            root = block;
+            freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(block->objects);
         }
-        BlockObject* object = freeList;
-        assert(object != 0);
-        freeList = object->nextUnused;
-        return new (object->buffer) Object();
+        return BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+    }
+
+    Object* request ()
+    {
+        return request<StandardCtor>(standardCtor);
     }
 
     void release (Object* pointer)
     {
-        assert(pointer != 0);
-        pointer->~Object();
-        BlockObject* object = reinterpret_cast<BlockObject*>(pointer);
-        object->nextUnused = freeList;
-        freeList = object;
+        BlockMemoryPoolImplementation::setObjectUnused<BlockObject, Object>(freeList, pointer);
     }
 };
 
-#endif // STATICMEMORYPOOL_H
+#endif // ALIGNEDMEMORYPOOL_H
