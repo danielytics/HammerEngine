@@ -9,15 +9,8 @@
   */
 
 #include "Entity.h"
-
-#if !defined(__SSE__) && defined(_M_IX86_FP) && _M_IX86_FP>=1
-#define __SSE__
-#endif
-
-#if defined(__SSE__) && defined(PERFORM_PREFETCH)
-#include <xmmintrin.h>
-#define PREFETCH_HINT _MM_HINT_NTA
-#endif
+#include "SimdMacros.h"
+#include "DebugTools.h"
 
 #include <iostream>
 
@@ -57,7 +50,8 @@ public:
         T1* t1;
         if (entity.canGetTrait<T1>(t1))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -101,7 +95,8 @@ public:
         T1* t1; T2* t2;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -131,7 +126,8 @@ public:
         T1* t1; T2* t2; T3* t3;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, *t3, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -159,7 +155,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, *t3, *t4, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -188,7 +185,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, *t3, *t4, *t5, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -217,7 +215,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, *t3, *t4, *t5, *t6, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -246,7 +245,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, *t3, *t4, *t5, *t6, *t7, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -275,7 +275,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -304,7 +305,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8; T9* t9;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8) && entity.canGetTrait<T9>(t9))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(entity, *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -335,7 +337,8 @@ public:
         T1* t1;
         if (entity.canGetTrait<T1>(t1))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -364,7 +367,8 @@ public:
         T1* t1; T2* t2;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -393,7 +397,8 @@ public:
         T1* t1; T2* t2; T3* t3;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, *t3, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -421,7 +426,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, *t3, *t4, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -450,7 +456,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, *t3, *t4, *t5, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -479,7 +486,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, *t3, *t4, *t5, *t6, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -508,7 +516,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, *t3, *t4, *t5, *t6, *t7, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -537,7 +546,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, out);
             *t1 = out; // TODO: Delay this until later.
         }
@@ -566,7 +576,8 @@ public:
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8; T9* t9;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8) && entity.canGetTrait<T9>(t9))
         {
-            T1 out;
+            ALIGNED(T1 out);
+            assert_align(&out, 16);
             function(*t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9, out);
             *t1 = out; // TODO: Delay this until later.
         }

@@ -1,13 +1,12 @@
 
 #include <iostream>
+#include <vector>
 
 #include "HammerEntitySystem.h"
 #include "TraitBuilder.h"
 #include "BehaviorFunctor.h"
 
 #include "DebugTools.h"
-
-#include <iostream>
 
 struct EntityConstructor
 {
@@ -26,7 +25,7 @@ HammerEntitySystem::HammerEntitySystem ()
 
 HammerEntitySystem::~HammerEntitySystem ()
 {
-    for (std::vector<Entity*>::iterator iter = entityList.begin(); iter != entityList.end(); ++iter)
+    for (tbb::concurrent_vector<Entity*>::iterator iter = entityList.begin(); iter != entityList.end(); ++iter)
     {
         entityPool.release(*iter);
     }
@@ -39,15 +38,14 @@ Entity& HammerEntitySystem::createEntity ()
     EntityConstructor ctor;
     ctor.thisPtr = this;
     ctor.id = entityList.size();
-//    Entity* entity = new Entity(*this, entityList.size()); // TODO: Memory pool
     Entity* entity = entityPool.request<EntityConstructor>(ctor);
     entityList.push_back(entity);
     return *deref(entity);
 }
 
-Entity& HammerEntitySystem::getEntityFromTrait  (const AbstractTrait* trait)
+Entity& HammerEntitySystem::getEntityFromTrait  (const AbstractTrait::Type trait)
 {
-    std::unordered_map<const AbstractTrait*, Entity*>::iterator iter = traitToEntityMap.find(trait);
+    tbb::concurrent_unordered_map<const AbstractTrait::Type, Entity*>::iterator iter = traitToEntityMap.find(trait);
     if (iter != traitToEntityMap.end())
     {
         return *deref((deref_iter(iter, traitToEntityMap).second));
@@ -89,9 +87,9 @@ void HammerEntitySystem::registerTrait (unsigned int trait, TraitFactory* factor
     traitRegistrar[trait] = factory;
 }
 
-AbstractTrait* HammerEntitySystem::getTrait (unsigned int entity, unsigned int trait)
+AbstractTrait::Type HammerEntitySystem::getTrait (unsigned int entity, unsigned int trait)
 {
-    std::unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(trait);
+    tbb::concurrent_unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(trait);
     if (iter != traitRegistrar.end())
     {
         TraitFactory* factory = deref_iter(iter, traitRegistrar).second;
@@ -106,7 +104,7 @@ AbstractTrait* HammerEntitySystem::getTrait (unsigned int entity, unsigned int t
 // TODO: Queue until next behavior update
 void HammerEntitySystem::addTrait (unsigned int entity, unsigned int trait)
 {
-    std::unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(trait);
+    tbb::concurrent_unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(trait);
     if (iter != traitRegistrar.end())
     {
         TraitFactory* factory = deref_iter(iter, traitRegistrar).second;
@@ -120,7 +118,7 @@ void HammerEntitySystem::addTrait (unsigned int entity, unsigned int trait)
 // TODO: Queue until next behavior update
 void HammerEntitySystem::removeTrait (unsigned int entity, unsigned int trait)
 {
-    std::unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(trait);
+    tbb::concurrent_unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(trait);
     if (iter != traitRegistrar.end())
     {
         TraitFactory* factory = deref_iter(iter, traitRegistrar).second;
@@ -145,18 +143,24 @@ void HammerEntitySystem::registerBehavior (unsigned int trait, BehaviorFunctor* 
   */
 void HammerEntitySystem::updateBehavior ()
 {
-    for (unsigned int i=0; i < behaviors.size(); ++i)
+    // Iterate through behaviors
+    tbb::concurrent_vector<std::pair<unsigned int, BehaviorFunctor*> >::iterator behavior_iter = behaviors.begin();
+    for (; behavior_iter != behaviors.end(); ++behavior_iter)
     {
-        unsigned int traitId = behaviors[i].first;
-        std::unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(traitId);
+        unsigned int traitId = deref_iter(behavior_iter, behaviors).first;
+
+        // Get trait factory for behvaiors main trait
+        tbb::concurrent_unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(traitId);
         if (iter != traitRegistrar.end())
         {
             TraitFactory* factory = deref_iter(iter, traitRegistrar).second;
             if (factory != 0)
             {
+                // Get vector of entities for current trait
                 std::vector<unsigned int> entities;
                 deref(factory)->getEntities(entities);
 
+                // Iterate through the entities
                 std::vector<unsigned int>::iterator it = entities.begin();
                 Entity* entity = 0;
                 // Process each entity
@@ -165,7 +169,7 @@ void HammerEntitySystem::updateBehavior ()
                     // Get the entity
                     entity = &getEntity(deref_iter(it, entities));
                     // Process current entity
-                    (*(behaviors[i].second))(*deref(entity));
+                    (*(deref_iter(behavior_iter, behaviors).second))(*deref(entity));
                     // Advance to next entity
                     ++it;
                 }

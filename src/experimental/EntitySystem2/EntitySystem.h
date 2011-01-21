@@ -8,7 +8,8 @@
   *
   */
 
-class AbstractTrait;
+#include "Trait.h"
+
 class BehaviorFunctor;
 class TraitFactory;
 class MemoryPool;
@@ -27,7 +28,7 @@ public:
 
     // Entity API
     virtual Entity&         createEntity        () = 0;
-    virtual Entity&         getEntityFromTrait  (const AbstractTrait* trait) = 0;
+    virtual Entity&         getEntityFromTrait  (const AbstractTrait::Type trait) = 0;
     virtual Entity&         getEntity           (unsigned int entity) = 0;
     virtual void            destroyEntity       (const Entity&)=0; // Queued
     virtual EntityState     getState            (const Entity&)=0;
@@ -35,7 +36,7 @@ public:
 
     // Trait API
     virtual void            registerTrait       (unsigned int trait, TraitFactory* factory) = 0;
-    virtual AbstractTrait*  getTrait            (unsigned int entity, unsigned int trait)   = 0;
+    virtual AbstractTrait::Type  getTrait            (unsigned int entity, unsigned int trait)   = 0;
     virtual void            addTrait            (unsigned int entity, unsigned int trait)   = 0; // Queued
     virtual void            removeTrait         (unsigned int entity, unsigned int trait)   = 0; // Queued
 

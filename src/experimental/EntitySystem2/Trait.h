@@ -2,38 +2,30 @@
 #define HAMMER_ENGINE_TRAIT__H_
 
 #include <typeinfo>
+#include "SimdMacros.h"
 
-class AbstractTrait
+struct AbstractTrait
 {
-public:
-    virtual ~AbstractTrait () {}
-
-    virtual unsigned int getId () const=0;
-    virtual const char* name () const=0;
+    typedef unsigned int Type;
+    template <class T> static inline T* to_ptr (Type trait)
+    {
+        return reinterpret_cast<T*>(trait);
+    }
+    template <class T> static inline Type from_ptr (T* ptr)
+    {
+        return reinterpret_cast<Type>(ptr);
+    }
 };
 
-template <class T> class Trait : public AbstractTrait
+template <class T> class Trait
 {
 public:
     Trait () : data() {}
-    Trait (T& d) : data(&d)
-    {
-
-    }
-    virtual ~Trait () {}
+    Trait (T& d) : data(&d) {}
+    ~Trait () {}
 
     typedef T trait_type;
-    T data;
-
-    unsigned int getId () const
-    {
-        return id();
-    }
-
-    const char* name () const
-    {
-        return typeid(T).name();
-    }
+    ALIGNED( T data);
 
     static inline unsigned int id ()
     {

@@ -13,7 +13,7 @@ struct Position
     float x;
     float y;
     float z;
-    unsigned int memory[1];
+    float padding[1];
 
     Position& operator= (const Position& input)
     {

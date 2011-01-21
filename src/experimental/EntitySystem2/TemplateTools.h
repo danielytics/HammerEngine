@@ -26,4 +26,19 @@ template<int,typename MSG> struct compile_error_type { enum { Value=0}; typedef 
 template<typename MSG> struct compile_error_type <true,MSG> : invalid_template_type<MSG,MSG> { enum { Value=0}; typedef void Type;};
 #define compile_error(condition,message) compile_error_type<(condition), struct CONCAT_X_Y(ERROR___,message)>
 
+// Alignment masks
+template <int Alignment> struct AlignmentMask; // Unsupported alignment
+template <> struct AlignmentMask<2>    {enum { Mask = 0x001 };};
+template <> struct AlignmentMask<4>    {enum { Mask = 0x003 };};
+template <> struct AlignmentMask<8>    {enum { Mask = 0x007 };};
+template <> struct AlignmentMask<16>   {enum { Mask = 0x00f };};
+template <> struct AlignmentMask<32>   {enum { Mask = 0x01f };};
+template <> struct AlignmentMask<64>   {enum { Mask = 0x03f };};
+template <> struct AlignmentMask<128>  {enum { Mask = 0x07f };};
+template <> struct AlignmentMask<256>  {enum { Mask = 0x0ff };};
+template <> struct AlignmentMask<512>  {enum { Mask = 0x1ff };};
+template <> struct AlignmentMask<1024> {enum { Mask = 0x3ff };};
+template <> struct AlignmentMask<2048> {enum { Mask = 0x7ff };};
+template <> struct AlignmentMask<4096> {enum { Mask = 0xfff };};
+
 #endif // TEMPLATETOOLS_H

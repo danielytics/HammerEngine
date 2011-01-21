@@ -11,14 +11,18 @@ TARGET = EntitySystem
 CONFIG   += console
 CONFIG   -= app_bundle
 TEMPLATE = app
-QMAKE_CXXFLAGS_RELEASE += -std=gnu++0x -O3 -mmmx -msse -DPERFORM_PREFETCH -DNDEBUG
-QMAKE_CXXFLAGS_DEBUG += -std=gnu++0x -O3 -mmmx -msse -DPERFORM_PREFETCH
+QMAKE_CXXFLAGS_RELEASE += -O3 -mmmx -msse -msse2 -mfpmath=sse -ftree-vectorize -ffast-math -DPERFORM_PREFETCH -DNDEBUG
+QMAKE_CXXFLAGS_DEBUG += -O0 -mmmx -msse
+
+INCLUDEPATH += ../HammerEngine/src/depends/ThreadingBuildingBlocks/include
+LIBS += ../EntitySystem2-build-desktop/release/tbb.dll
 
 SOURCES += main.cpp \
     Position.cpp \
     Movement.cpp \
     HammerEntitySystem.cpp \
-    Observed.cpp
+    Observed.cpp \
+    Collidable.cpp
 
 HEADERS += \
     Position.h \
@@ -37,4 +41,7 @@ HEADERS += \
     TemplateTools.h \
     AlignedMemoryPool.h \
     BlockMemoryPoolImpl.h \
-    UnalignedMemoryPool.h
+    UnalignedMemoryPool.h \
+    Collidable.h \
+    Null.h \
+    SimdMacros.h

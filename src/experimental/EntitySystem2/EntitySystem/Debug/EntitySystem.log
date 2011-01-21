@@ -1,9 +1,44 @@
-﻿Build started 18/01/2011 06:18:15.
-     1>Project "C:\Qt\Projects\EntitySystem2\EntitySystem\EntitySystem.vcxproj" on node 2 (clean target(s)).
-     1>_PrepareForClean:
-         Deleting file "Debug\EntitySystem.lastbuildstate".
-     1>Done Building Project "C:\Qt\Projects\EntitySystem2\EntitySystem\EntitySystem.vcxproj" (clean target(s)).
+﻿Build started 20/01/2011 04:29:34.
+     1>Project "C:\Qt\Projects\EntitySystem2\EntitySystem\EntitySystem.vcxproj" on node 2 (rebuild target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\EntitySystem.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D PERFORM_PREFETCH /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /arch:SSE2 /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\Collidable.cpp ..\HammerEntitySystem.cpp ..\main.cpp ..\Movement.cpp ..\Observed.cpp ..\Position.cpp
+         Position.cpp
+         Observed.cpp
+         Movement.cpp
+         main.cpp
+         HammerEntitySystem.cpp
+         Collidable.cpp
+         Generating Code...
+       ManifestResourceCompile:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\EntitySystem.exe.embed.manifest.res" Debug\EntitySystem_manifest.rc 
+       Link:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Qt\Projects\EntitySystem2\EntitySystem\Debug\EntitySystem.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\EntitySystem.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Qt\Projects\EntitySystem2\EntitySystem\Debug\EntitySystem.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Qt\Projects\EntitySystem2\EntitySystem\Debug\EntitySystem.lib" /MACHINE:X86 Debug\EntitySystem.exe.embed.manifest.res
+         Debug\Collidable.obj
+         Debug\HammerEntitySystem.obj
+         Debug\main.obj
+         Debug\Movement.obj
+         Debug\Observed.obj
+         Debug\Position.obj
+       Manifest:
+         Deleting file "Debug\EntitySystem.exe.embed.manifest".
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\EntitySystem.exe.embed.manifest" /manifest Debug\EntitySystem.exe.intermediate.manifest
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\EntitySystem.exe.embed.manifest.res" Debug\EntitySystem_manifest.rc 
+       LinkEmbedManifest:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Qt\Projects\EntitySystem2\EntitySystem\Debug\EntitySystem.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\EntitySystem.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Qt\Projects\EntitySystem2\EntitySystem\Debug\EntitySystem.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Qt\Projects\EntitySystem2\EntitySystem\Debug\EntitySystem.lib" /MACHINE:X86 Debug\EntitySystem.exe.embed.manifest.res
+         Debug\Collidable.obj
+         Debug\HammerEntitySystem.obj
+         Debug\main.obj
+         Debug\Movement.obj
+         Debug\Observed.obj
+         Debug\Position.obj
+         EntitySystem.vcxproj -> C:\Qt\Projects\EntitySystem2\EntitySystem\Debug\EntitySystem.exe
+       FinalizeBuildStatus:
+         Deleting file "Debug\EntitySystem.unsuccessfulbuild".
+         Touching "Debug\EntitySystem.lastbuildstate".
+     1>Done Building Project "C:\Qt\Projects\EntitySystem2\EntitySystem\EntitySystem.vcxproj" (rebuild target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.03
+Time Elapsed 00:00:08.73

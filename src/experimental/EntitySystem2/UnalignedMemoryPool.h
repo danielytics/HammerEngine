@@ -6,6 +6,7 @@
 #include "BlockMemoryPoolImpl.h"
 
 #include <typeinfo>
+#include <sstream>
 
 template <class Feature, class Object, int PoolSize> class UnalignedMemoryPool : invalid_template(Feature, Attempted_to_instantiate_UnalignedMemoryPool_with_unsupported_feature)
 {
@@ -14,7 +15,7 @@ template <class Feature, class Object, int PoolSize> class UnalignedMemoryPool :
 
 /**
   * Static UnalignedMemoryPool
-  * A memory pool whose objects are not aligned to any specific byte boundary, which is a static size.
+  * A memory pool whose objects are not aligned to a 16-byte boundary (but guaranteed to be aligned correctly for the object it pools), which is a static size.
   * Throws an exception if an object is requested when all objects in the pool are used.
   */
 template <class Object, int PoolSize> class UnalignedMemoryPool<MemoryFeatures::StaticPool<PoolSize>, Object, PoolSize>
@@ -26,7 +27,7 @@ private:
         char buffer[ObjectSize]; // Make sure union size is 16-byte aligned
         BlockObject* nextUnused; // Maintain links to unused objects
     };
-    BlockObject objects[PoolSize]; // Static array of objects
+    BlockObject* objects[PoolSize]; // Static array of objects
     BlockObject* freeList;
 
     struct StandardCtor
@@ -40,14 +41,15 @@ private:
 
 public:
     UnalignedMemoryPool ()
+        : objects(new char[sizeof(BlockObject) * PoolSize]) // 'new char[x]' is guaranteed to be properly aligned for any obejct equal to or less than x
     {
         // Point freeList at the first object
-        freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, PoolSize>(objects);
+        freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, PoolSize>(*deref(objects));
     }
 
     ~UnalignedMemoryPool ()
     {
-
+        delete [] objects;
     }
 
     template <class Ctor> Object* request (Ctor& ctor)
@@ -93,7 +95,6 @@ private:
         BlockObject objects[BlockSize];
         Block* next;
     };
-    Block staticBlock;
     Block* root;
     BlockObject* freeList;
 
@@ -108,10 +109,10 @@ private:
 
 public:
     UnalignedMemoryPool ()
-        : root(&staticBlock) // First block is statically allocated
-        , freeList(BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(staticBlock.objects))
+        : root(reinterpret_cast<Block*>(new char[sizeof(Block)])) // First block is statically allocated, 'new char[x]' is guaranteed to be properly aligned for any obejct equal to or less than x
+        , freeList(BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(root->objects))
     {
-        staticBlock.next = 0;
+        root->next = 0;
     }
 
     ~UnalignedMemoryPool ()
@@ -122,7 +123,7 @@ public:
         {
             temp = next;
             next = next->next;
-            if (temp != &staticBlock) delete temp;
+            delete [] reinterpret_cast<char*>(temp);
         }
     }
 
@@ -131,7 +132,7 @@ public:
         if (!freeList)
         {
             // There are no more free objects in the pool, allocate more.
-            Block* block = new Block;
+            Block* block = reinterpret_cast<Block*>(new char[sizeof(Block)]); // 'new char[x]' is guaranteed to be properly aligned for any obejct equal to or less than x
             block->next = root;
             root = block;
             freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(block->objects);

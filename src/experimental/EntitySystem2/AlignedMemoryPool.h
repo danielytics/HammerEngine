@@ -6,6 +6,8 @@
 #include "BlockMemoryPoolImpl.h"
 
 #include <typeinfo>
+#include <sstream>
+#include <xmmintrin.h> // needed for _mm_malloc
 
 template <class Feature, class Object, int PoolSize> class AlignedMemoryPool : invalid_template(Feature, Attempted_to_instantiate_AlignedMemoryPool_with_unsupported_feature)
 {
@@ -26,7 +28,7 @@ private:
         char buffer[ObjectSize]; // Make sure union size is 16-byte aligned
         BlockObject* nextUnused; // Maintain links to unused objects
     };
-    BlockObject objects[PoolSize]; // Static array of objects
+    BlockObject* objects[PoolSize]; // Static array of objects
     BlockObject* freeList;
 
     struct StandardCtor
@@ -40,14 +42,16 @@ private:
 
 public:
     AlignedMemoryPool ()
+        : objects(reinterpret_cast<BlockObject*>(_mm_malloc(sizeof(BlockObject) * PoolSize, 16))) // Allocate static memory aligned to hold any BlockObject // TODO: make sure this is 16-byte aligned
     {
         // Point freeList at the first object
-        freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, PoolSize>(objects);
+        freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, PoolSize>(*deref(objects));
+        assert_align(objects, 16);
     }
 
     ~AlignedMemoryPool ()
     {
-
+        delete [] objects;
     }
 
     template <class Ctor> Object* request (Ctor& ctor)
@@ -55,12 +59,13 @@ public:
         if (!freeList)
         {
             // There are no more free objects in the pool, allocate more.
-            // TODO: Do we want an eviction policy??
             std::ostringstream sstr;
             sstr << "Static AlignedMemoryPool is out of objects of type " << typeid(Object).name();
             throw std::runtime_error(sstr.str());
         }
-        return BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+        Object* obj = BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+        assert_align(obj, 16);
+        return obj;
     }
 
     Object* request ()
@@ -88,12 +93,11 @@ private:
         char buffer[ObjectSize]; // Make sure union size is 16-byte aligned
         BlockObject* nextUnused; // Maintain links to unused objects
     };
-    struct Block // TODO: make sure Block is aligned (add attributes to align static block and use aligned malloc to allocate new blocks)
+    struct Block
     {
         BlockObject objects[BlockSize];
         Block* next;
     };
-    Block staticBlock;
     Block* root;
     BlockObject* freeList;
 
@@ -108,10 +112,11 @@ private:
 
 public:
     AlignedMemoryPool ()
-        : root(&staticBlock) // First block is statically allocated
-        , freeList(BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(staticBlock.objects))
+        : root(reinterpret_cast<Block*>(_mm_malloc(sizeof(Block), 16))) // First block is allocated at construction, 'new char[x]' is guaranteed to be properly aligned for any obejct equal to or less than x
+        , freeList(BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(root->objects))
     {
-        staticBlock.next = 0;
+        root->next = 0;
+        assert_align(root->objects, 16);
     }
 
     ~AlignedMemoryPool ()
@@ -122,7 +127,7 @@ public:
         {
             temp = next;
             next = next->next;
-            if (temp != &staticBlock) delete temp;
+            delete [] reinterpret_cast<char*>(temp);
         }
     }
 
@@ -131,12 +136,15 @@ public:
         if (!freeList)
         {
             // There are no more free objects in the pool, allocate more.
-            Block* block = new Block;
+            Block* block = reinterpret_cast<Block*>(_mm_malloc(sizeof(Block), 16)); // 'new char[x]' is guaranteed to be properly aligned for any obejct equal to or less than x
+            assert_align(block->objects, 16);
             block->next = root;
             root = block;
             freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(block->objects);
         }
-        return BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+        Object* obj = BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+        assert_align(obj, 16);
+        return obj;
     }
 
     Object* request ()

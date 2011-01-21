@@ -32,10 +32,12 @@ public:
 
     template <class T> inline T& trait () const
     {
-        AbstractTrait* t = owner.getTrait(id, Trait<T>::id());
+        AbstractTrait::Type t = owner.getTrait(id, Trait<T>::id());
         if (t)
         {
-            return deref(static_cast<Trait<T>*>(t))->data;
+            Trait<T>* tt = AbstractTrait::to_ptr<Trait<T> >(t);
+            assert_align(&(deref(tt)->data), 16);
+            return deref(tt)->data;
         } else
         {
             std::ostringstream sstr;
@@ -46,7 +48,9 @@ public:
 
     template <class T> inline T& getTraitUnsafe () const
     {
-        return deref(static_cast<Trait<T>*>(owner.getTrait(id, Trait<T>::id())))->data;
+        Trait<T>* t = AbstractTrait::to_ptr<Trait<T> >(owner.getTrait(id, Trait<T>::id()));
+        assert_align(&(deref(t)->data), 16);
+        return deref(t)->data;
     }
 
     template <class T> inline bool hasTrait () const
@@ -56,10 +60,12 @@ public:
 
     template <class T> inline bool canGetTrait (T*& trait) const
     {
-        AbstractTrait* t = owner.getTrait(id, Trait<T>::id());
+        AbstractTrait::Type t = owner.getTrait(id, Trait<T>::id());
         if (t)
         {
-            trait = &(deref(static_cast<Trait<T>*>(t))->data);
+            Trait<T>* tt = AbstractTrait::to_ptr<Trait<T> >(t);
+            assert_align(&(deref(tt)->data), 16);
+            trait = &(deref(tt)->data);
             return true;
         }
         return false;

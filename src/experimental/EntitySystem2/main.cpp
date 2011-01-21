@@ -6,6 +6,7 @@
 #include "Position.h"
 #include "Movement.h"
 #include "Observed.h"
+#include "Collidable.h"
 
 #include "DebugTools.h"
 
@@ -16,6 +17,15 @@
 
 int main(int argc, char *argv[])
 {
+    std::cout << "sizeof(Position) = " << sizeof(Position) << "\n";
+    std::cout << "sizeof(Trait<Position>) = " << sizeof(Trait<Position>) << "\n";
+    std::cout << "sizeof(Movement) = " << sizeof(Movement) << "\n";
+    std::cout << "sizeof(Trait<Movement>) = " << sizeof(Trait<Movement>) << "\n";
+    std::cout << "sizeof(Observed) = " << sizeof(Observed) << "\n";
+    std::cout << "sizeof(Trait<Observed>) = " << sizeof(Trait<Observed>) << "\n";
+    std::cout << "sizeof(Trait<char>) = " << sizeof(Trait<char>) << "\n";
+
+
     try {
         HammerEntitySystem hammerEngine;
 
@@ -25,6 +35,7 @@ int main(int argc, char *argv[])
         PositionUtils::install(&traitBuilder, &behaviorBuilder);
         MovementUtils::install(&traitBuilder, &behaviorBuilder);
         ObservedUtils::install(&traitBuilder, &behaviorBuilder);
+        CollidableUtils::install(&traitBuilder, &behaviorBuilder);
 
         {
             Entity player = hammerEngine.createEntity()

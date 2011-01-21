@@ -5,6 +5,8 @@
 #include "Movement.h"
 #include "Position.h"
 
+#include "DebugTools.h"
+
 void MovementUtils::init (Movement& output, const float x, const float y, const float z)
 {
     output.x = x;

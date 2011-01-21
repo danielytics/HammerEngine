@@ -8,24 +8,23 @@
   *
   */
 
-#include <map>
-#include <vector>
-
 #include "EntitySystem.h"
 #include "Trait.h"
 #include "AlignedMemoryPool.h"
 #include "DebugTools.h"
 
-#include <unordered_map>
+#include <tbb/concurrent_unordered_map.h>
+#include <vector>
+
 
 class TraitFactory
 {
 public:
     virtual ~TraitFactory() {}
 
-    virtual AbstractTrait* create (unsigned int) = 0;
+    virtual AbstractTrait::Type create (unsigned int) = 0;
     virtual void destroy (unsigned int) = 0;
-    virtual AbstractTrait* lookup (unsigned int)=0;
+    virtual AbstractTrait::Type lookup (unsigned int)=0;
     virtual void getEntities (std::vector<unsigned int>&)=0;
 };
 
@@ -35,47 +34,67 @@ private:
     typedef Trait<T> TraitType;
     typename CreateMemoryPool<AlignedMemoryPool, Feature, TraitType>::Type pool;
 
-    typedef typename std::unordered_map<unsigned int, TraitType*>::iterator IterType;
-    std::unordered_map<unsigned int, TraitType*> entityMap;
+    typedef typename tbb::concurrent_unordered_map<unsigned int, TraitType*>::iterator IterType;
+    tbb::concurrent_unordered_map<unsigned int, TraitType*> entityMap;
 
 public:
     TraitFactoryWrapper () {}
     virtual ~TraitFactoryWrapper () {}
 
-    AbstractTrait* create (unsigned int entity)
+    /**
+      * Create a new trait object and return an AbstractTrat type.
+      *
+      * WARNING: Not thread safe!
+      */
+    AbstractTrait::Type create (unsigned int entity)
     {
         IterType iter = entityMap.find(entity);
         if (iter == entityMap.end())
         {
-            TraitType* trait = pool.request();
+            TraitType* trait = pool.request(); // This call is NOT thread safe!
             entityMap[entity] = trait;
-            return trait;
+            return AbstractTrait::from_ptr(trait);
         }
-        return (*iter).second;
+        return AbstractTrait::from_ptr((*iter).second);
     }
 
+    /**
+      * Destroy a trait object.
+      *
+      * WARNING: Not thread safe!
+      */
     void destroy (unsigned int entity)
     {
         IterType iter = entityMap.find(entity);
         if (iter != entityMap.end())
         {
             TraitType* t = deref_iter(iter, entityMap).second;
-            entityMap.erase(iter);
-            pool.release(t);
+            entityMap.unsafe_erase(iter); // This call is NOT thread safe!
+            pool.release(t); // This call is NOT thread safe!
 
         }
     }
 
-    AbstractTrait* lookup (unsigned int entity)
+    /**
+      * Lookup a trait by entity id and return its AbstractTrait type.
+      *
+      * Thread safe.
+      */
+    AbstractTrait::Type lookup (unsigned int entity)
     {
         IterType iter = entityMap.find(entity);
         if (iter != entityMap.end())
         {
-            return deref_iter(iter, entityMap).second;
+            return AbstractTrait::from_ptr(deref_iter(iter, entityMap).second);
         }
-        return 0;
+        return AbstractTrait::from_ptr<T>(0);
     }
 
+    /**
+      * Get a vector of entity ids for all entities which contain traits in this factory.
+      *
+      * Thread safe.
+      */
     void getEntities (std::vector<unsigned int>& entities)
     {
         IterType iter = entityMap.begin();

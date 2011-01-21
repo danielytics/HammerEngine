@@ -3,10 +3,11 @@
 
 #include "DebugTools.h"
 #include "TemplateTools.h"
+
 template <int Size> struct CalculateObjectSize
 {
     // Calculate object size by making sure its size is a multiple of 16 bytes
-    enum { ObjectSize = (Size & 0xf) // Is Size already correct?
+    enum { ObjectSize = (Size & AlignmentMask<16>::Mask) // Is Size already correct?
                         ? /* No, pad with extra bytes   */ (((Size / 16) + 1 /* add another 16 bytes */) * 16)
                         : /* Yes, return Size unchanged */ Size};
 };
