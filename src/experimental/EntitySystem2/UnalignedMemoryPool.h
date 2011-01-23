@@ -34,6 +34,7 @@ private:
     {
         inline Object* construct (char* buffer)
         {
+            assert_not_null(buffer);
             return new (buffer) Object();
         }
     };
@@ -49,6 +50,7 @@ public:
 
     ~UnalignedMemoryPool ()
     {
+        assert_not_null(objects);
         delete [] objects;
     }
 
@@ -72,6 +74,7 @@ public:
 
     void release (Object* pointer)
     {
+        assert_not_null(pointer);
         BlockMemoryPoolImplementation::setObjectUnused<BlockObject, Object>(freeList, pointer);
     }
 };
@@ -102,6 +105,7 @@ private:
     {
         inline Object* construct (char* buffer)
         {
+            assert_not_null(buffer);
             return new (buffer) Object();
         }
     };
@@ -112,7 +116,8 @@ public:
         : root(reinterpret_cast<Block*>(new char[sizeof(Block)])) // First block is statically allocated, 'new char[x]' is guaranteed to be properly aligned for any obejct equal to or less than x
         , freeList(BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(root->objects))
     {
-        root->next = 0;
+        assert_not_null(root);
+        root->next = nullptr;
     }
 
     ~UnalignedMemoryPool ()
@@ -147,6 +152,7 @@ public:
 
     void release (Object* pointer)
     {
+        assert_not_null(pointer);
         BlockMemoryPoolImplementation::setObjectUnused<BlockObject, Object>(freeList, pointer);
     }
 };

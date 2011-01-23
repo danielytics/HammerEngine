@@ -39,9 +39,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Qt\Projects\HammerEngine\src\depends\ThreadingBuildingBlocks\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\Projects\HammerEngine\src\depends\ThreadingBuildingBlocks\lib\ia32\vc10;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Qt\Projects\HammerEngine\src\depends\ThreadingBuildingBlocks\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\Projects\HammerEngine\src\depends\ThreadingBuildingBlocks\lib\ia32\vc10;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -86,6 +90,7 @@
     <ClInclude Include="..\AlignedMemoryPool.h" />
     <ClInclude Include="..\BehaviorBuilder.h" />
     <ClInclude Include="..\BehaviorFunctor.h" />
+    <ClInclude Include="..\BlockMemoryPoolImpl.h" />
     <ClInclude Include="..\Collidable.h" />
     <ClInclude Include="..\DebugTools.h" />
     <ClInclude Include="..\Entity.h" />
@@ -93,8 +98,10 @@
     <ClInclude Include="..\HammerEntitySystem.h" />
     <ClInclude Include="..\MemoryPool.h" />
     <ClInclude Include="..\Movement.h" />
+    <ClInclude Include="..\Null.h" />
     <ClInclude Include="..\Observed.h" />
     <ClInclude Include="..\Position.h" />
+    <ClInclude Include="..\SimdMacros.h" />
     <ClInclude Include="..\TemplateTools.h" />
     <ClInclude Include="..\Trait.h" />
     <ClInclude Include="..\TraitBuilder.h" />

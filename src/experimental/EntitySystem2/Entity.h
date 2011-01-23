@@ -49,6 +49,7 @@ public:
     template <class T> inline T& getTraitUnsafe () const
     {
         Trait<T>* t = AbstractTrait::to_ptr<Trait<T> >(owner.getTrait(id, Trait<T>::id()));
+        assert_not_null(t);
         assert_align(&(deref(t)->data), 16);
         return deref(t)->data;
     }
@@ -64,6 +65,7 @@ public:
         if (t)
         {
             Trait<T>* tt = AbstractTrait::to_ptr<Trait<T> >(t);
+            assert_not_null(tt);
             assert_align(&(deref(tt)->data), 16);
             trait = &(deref(tt)->data);
             return true;

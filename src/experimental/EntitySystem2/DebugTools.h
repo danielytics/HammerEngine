@@ -14,11 +14,11 @@
 //#define static_assert(pred) switch(0){case 0:case pred:;}
 template<int,typename MSG> struct static_assert_type { enum { Value}; typedef int Type;};
 template<typename MSG> struct static_assert_type <true,MSG> {};
-#define static_assert(pred) static_assert_type<pred, struct ERROR___Static_assertion_failure>
+#define compiler_assert(pred) static_assert_type<pred, struct ERROR___Static_assertion_failure>
 
 #ifdef NDEBUG
 
-#define assert_not_null(ptr) (ptr)
+#define assert_not_null(ptr) ((void)0)
 #define deref(obj) (obj)
 #define deref_iter(iter,obj) (*(iter))
 #define assert_align(ptr,align) ((void)0)
@@ -26,6 +26,7 @@ template<typename MSG> struct static_assert_type <true,MSG> {};
 #else
 #include <sstream>
 #include "TemplateTools.h"
+#include "Null.h"
 
 // Safe object dereferencing
 template <class T> inline T DEBUGTOOLS_assert (T obj, bool failure, const std::string& message, unsigned int line)
@@ -41,10 +42,10 @@ template <class T> inline T DEBUGTOOLS_assert (T obj, bool failure, const std::s
 #define DEBUGTOOLS_ASSERT_DEREF(obj,invalid,msg,caption) (DEBUGTOOLS_assert(obj, obj == invalid, "Assertion failed: " caption " (" #msg ") in " __FILE__ " on line ", __LINE__))
 
 // Assert pointer is not null
-#define assert_not_null(ptr) DEBUGTOOLS_ASSERT_DEREF((ptr),0,ptr != NULL,"assert_not_null")
+#define assert_not_null(ptr) DEBUGTOOLS_ASSERT_DEREF((ptr),nullptr,ptr != NULL,"assert_not_null")
 
 // Dereferencing a pointer, assert its validity
-#define deref(obj) DEBUGTOOLS_ASSERT_DEREF((obj),0,obj != NULL,"deref")
+#define deref(obj) DEBUGTOOLS_ASSERT_DEREF((obj),nullptr,obj != NULL,"deref")
 
 // Dereferencing an iterator, assert its validity
 #define deref_iter(iter,obj) (*DEBUGTOOLS_ASSERT_DEREF((iter),((obj).end()),obj; iter != obj.end(),"deref iterator"))

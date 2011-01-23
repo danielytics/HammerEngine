@@ -69,6 +69,15 @@
     <ClInclude Include="..\Collidable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\BlockMemoryPoolImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Null.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimdMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\HammerEntitySystem.cpp">

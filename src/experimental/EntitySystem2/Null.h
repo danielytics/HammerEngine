@@ -1,6 +1,8 @@
 #ifndef NULL_H
 #define NULL_H
 
+#ifdef __GNUC__
+
 const class nullptr_t
 {
   public:
@@ -17,5 +19,6 @@ const class nullptr_t
 
 } nullptr = {};
 
+#endif
 
 #endif // NULL_H

@@ -35,6 +35,7 @@ private:
     {
         inline Object* construct (char* buffer)
         {
+            assert_not_null(buffer);
             return new (buffer) Object();
         }
     };
@@ -64,6 +65,7 @@ public:
             throw std::runtime_error(sstr.str());
         }
         Object* obj = BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+        assert_not_null(obj);
         assert_align(obj, 16);
         return obj;
     }
@@ -75,6 +77,7 @@ public:
 
     void release (Object* pointer)
     {
+        assert_not_null(pointer);
         BlockMemoryPoolImplementation::setObjectUnused<BlockObject, Object>(freeList, pointer);
     }
 };
@@ -105,6 +108,7 @@ private:
     {
         inline Object* construct (char* buffer)
         {
+            assert_not_null(buffer);
             return new (buffer) Object();
         }
     };
@@ -115,12 +119,14 @@ public:
         : root(reinterpret_cast<Block*>(_mm_malloc(sizeof(Block), 16))) // First block is allocated at construction, 'new char[x]' is guaranteed to be properly aligned for any obejct equal to or less than x
         , freeList(BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(root->objects))
     {
-        root->next = 0;
+        assert_not_null(root);
         assert_align(root->objects, 16);
+        root->next = nullptr;
     }
 
     ~AlignedMemoryPool ()
     {
+        assert_not_null(root);
         Block* next = root;
         Block* temp;
         while (next)
@@ -143,6 +149,7 @@ public:
             freeList = BlockMemoryPoolImplementation::initBlock<BlockObject, BlockSize>(block->objects);
         }
         Object* obj = BlockMemoryPoolImplementation::getUnusedObject<BlockObject, Object, Ctor>(freeList, ctor);
+        assert_not_null(obj);
         assert_align(obj, 16);
         return obj;
     }
@@ -154,6 +161,7 @@ public:
 
     void release (Object* pointer)
     {
+        assert_not_null(pointer);
         BlockMemoryPoolImplementation::setObjectUnused<BlockObject, Object>(freeList, pointer);
     }
 };

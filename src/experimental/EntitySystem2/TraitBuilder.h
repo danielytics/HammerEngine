@@ -15,6 +15,7 @@
 
 #include <tbb/concurrent_unordered_map.h>
 #include <vector>
+#include <algorithm>
 
 
 class TraitFactory
@@ -36,6 +37,7 @@ private:
 
     typedef typename tbb::concurrent_unordered_map<unsigned int, TraitType*>::iterator IterType;
     tbb::concurrent_unordered_map<unsigned int, TraitType*> entityMap;
+    std::vector<unsigned int> listOfEntities;
 
 public:
     TraitFactoryWrapper () {}
@@ -52,7 +54,9 @@ public:
         if (iter == entityMap.end())
         {
             TraitType* trait = pool.request(); // This call is NOT thread safe!
+            assert_not_null(trait);
             entityMap[entity] = trait;
+            listOfEntities.push_back(entity); // This call is NOT thread safe!
             return AbstractTrait::from_ptr(trait);
         }
         return AbstractTrait::from_ptr((*iter).second);
@@ -69,6 +73,15 @@ public:
         if (iter != entityMap.end())
         {
             TraitType* t = deref_iter(iter, entityMap).second;
+            assert_not_null(t);
+
+            // Next line is NOT thread safe!
+            std::vector<unsigned int>::iterator it = std::find(listOfEntities.begin(), listOfEntities.end(), entity);
+            if (it != listOfEntities.end())
+            {
+                *it = listOfEntities.back(); // This call is NOT thread safe!
+                listOfEntities.pop_back(); // This call is NOT thread safe!
+            }
             entityMap.unsafe_erase(iter); // This call is NOT thread safe!
             pool.release(t); // This call is NOT thread safe!
 
@@ -97,12 +110,13 @@ public:
       */
     void getEntities (std::vector<unsigned int>& entities)
     {
-        IterType iter = entityMap.begin();
-        while (iter != entityMap.end())
-        {
-            entities.push_back(deref_iter(iter, entityMap).first);
-            ++iter;
-        }
+        entities = listOfEntities;
+//        IterType iter = entityMap.begin();
+//        while (iter != entityMap.end())
+//        {
+//            entities.push_back(deref_iter(iter, entityMap).first);
+//            ++iter;
+//        }
     }
 };
 
@@ -111,7 +125,7 @@ class TraitBuilder
 private:
     EntitySystem* entitySystem;
 public:
-    TraitBuilder (EntitySystem* ngin) : entitySystem(ngin) {}
+    TraitBuilder (EntitySystem* ngin) : entitySystem(ngin) {assert_not_null(entitySystem);}
     ~TraitBuilder () {}
 
     template <class Features, class T>

@@ -17,15 +17,6 @@
 
 int main(int argc, char *argv[])
 {
-    std::cout << "sizeof(Position) = " << sizeof(Position) << "\n";
-    std::cout << "sizeof(Trait<Position>) = " << sizeof(Trait<Position>) << "\n";
-    std::cout << "sizeof(Movement) = " << sizeof(Movement) << "\n";
-    std::cout << "sizeof(Trait<Movement>) = " << sizeof(Trait<Movement>) << "\n";
-    std::cout << "sizeof(Observed) = " << sizeof(Observed) << "\n";
-    std::cout << "sizeof(Trait<Observed>) = " << sizeof(Trait<Observed>) << "\n";
-    std::cout << "sizeof(Trait<char>) = " << sizeof(Trait<char>) << "\n";
-
-
     try {
         HammerEntitySystem hammerEngine;
 
@@ -45,7 +36,6 @@ int main(int argc, char *argv[])
             PositionUtils::init(player.trait<Position>(), 0.0f, 0.0f, 1.0f);
             MovementUtils::init(player.trait<Movement>(), 0.0f, 1.0f, 0.0f);
             player.setState(Running);
-            std::cout << player.id << "\n";
         }
 
         {
@@ -56,7 +46,6 @@ int main(int argc, char *argv[])
             PositionUtils::init(enemy.trait<Position>(), 0.0f, 0.0f, 2.0f);
             MovementUtils::init(enemy.trait<Movement>(), 1.0f, 0.0f, 0.0f);
             enemy.setState(Running);
-            std::cout << enemy.id << "\n";
         }
         {
             Entity enemy = hammerEngine.createEntity()
@@ -69,7 +58,7 @@ int main(int argc, char *argv[])
         }
 
         unsigned int last=0;
-        for (unsigned int i = 0; i < 1000; i++) {
+        for (unsigned int i = 0; i < 50000; i++) {
             Entity unobserved = hammerEngine.createEntity()
                                     .addTrait<Position>()
                                     .addTrait<Movement>();
@@ -80,16 +69,24 @@ int main(int argc, char *argv[])
         }
 
         // Update the system a few times.
-        for (unsigned int i = 0; i < 100; ++i)
+        for (unsigned int i = 0; i < 240; ++i)
         {
             hammerEngine.updateBehavior();
         }
 
         std::cout << "Last unobserved entity: " << Entity(hammerEngine, last).trait<Position>() << "\n";
     }
+    catch (std::runtime_error& error)
+    {
+        std::cout << "Unhandled runtime error detected, program terminating:" << error.what() << "\n";
+    }
+    catch (std::logic_error& error)
+    {
+        std::cout << "Logic error detected, program terminating:\n" << error.what() << "\n";
+    }
     catch (std::exception& error)
     {
-        std::cout << "Fatal exception caught: " << error.what() << "\n";
+        std::cout << "Fatal exception detected, program terminating:\n" << error.what() << "\n";
     }
 
     return 0;
