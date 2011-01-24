@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     Movement.cpp \
     HammerEntitySystem.cpp \
     Observed.cpp \
-    Collidable.cpp
+    Collidable.cpp \
+    HammerEventDispatcher.cpp
 
 HEADERS += \
     Position.h \
@@ -44,4 +45,10 @@ HEADERS += \
     UnalignedMemoryPool.h \
     Collidable.h \
     Null.h \
-    SimdMacros.h
+    SimdMacros.h \
+    ReadOnlyEntitySystem.h \
+    EntityState.h \
+    EventDispatcher.h \
+    Event.h \
+    Attribute.h \
+    HammerEventDispatcher.h

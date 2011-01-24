@@ -23,7 +23,7 @@ class BehaviorFunctor
 {
 public:
     virtual ~BehaviorFunctor () {}
-    virtual void operator() (Entity& entity) const=0;
+    virtual void operator() (const ReadOnlyEntity& entity) const=0;
 };
 
 // PASS ENTITY TO BEHAVIOR
@@ -38,14 +38,14 @@ template <class T1>
 class BehaviorFunctorWrapper1 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper1 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper1 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1;
         if (entity.canGetTrait<T1>(t1))
@@ -68,14 +68,14 @@ template <class T1, class T2>
 class BehaviorFunctorWrapper2 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper2 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper2 () {}
 
-//    void prefetch (const Entity& entity)
+//    void prefetch (const ReadOnlyEntity& entity)
 //    {
 //        if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2))
 //        {
@@ -90,7 +90,7 @@ public:
 //        }
 //    }
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2))
@@ -114,14 +114,14 @@ template <class T1, class T2, class T3>
 class BehaviorFunctorWrapper3 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper3 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper3 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3))
@@ -143,14 +143,14 @@ public:
 template <class T1, class T2, class T3, class T4>
 class BehaviorFunctorWrapper4 : public BehaviorFunctor
 {
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper4 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper4 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4))
@@ -173,14 +173,14 @@ template <class T1, class T2, class T3, class T4, class T5>
 class BehaviorFunctorWrapper5 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper5 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper5 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5))
@@ -203,14 +203,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6>
 class BehaviorFunctorWrapper6 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper6 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper6 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6))
@@ -233,14 +233,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 class BehaviorFunctorWrapper7 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper7 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper7 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7))
@@ -263,14 +263,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, 
 class BehaviorFunctorWrapper8 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper8 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper8 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8))
@@ -293,14 +293,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, 
 class BehaviorFunctorWrapper9 : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&, T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&, T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper9 (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper9 () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8; T9* t9;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8) && entity.canGetTrait<T9>(t9))
@@ -332,7 +332,7 @@ public:
     BehaviorFunctorWrapper1NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper1NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1;
         if (entity.canGetTrait<T1>(t1))
@@ -362,7 +362,7 @@ public:
     BehaviorFunctorWrapper2NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper2NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2))
@@ -392,7 +392,7 @@ public:
     BehaviorFunctorWrapper3NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper3NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3))
@@ -421,7 +421,7 @@ public:
     BehaviorFunctorWrapper4NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper4NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4))
@@ -451,7 +451,7 @@ public:
     BehaviorFunctorWrapper5NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper5NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5))
@@ -481,7 +481,7 @@ public:
     BehaviorFunctorWrapper6NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper6NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6))
@@ -511,7 +511,7 @@ public:
     BehaviorFunctorWrapper7NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper7NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7))
@@ -541,7 +541,7 @@ public:
     BehaviorFunctorWrapper8NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper8NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8))
@@ -571,7 +571,7 @@ public:
     BehaviorFunctorWrapper9NE (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper9NE () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8; T9* t9;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8) && entity.canGetTrait<T9>(t9))
@@ -596,14 +596,14 @@ template <class T1>
 class BehaviorFunctorWrapper1NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper1NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper1NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1;
         if (entity.canGetTrait<T1>(t1))
@@ -623,14 +623,14 @@ template <class T1, class T2>
 class BehaviorFunctorWrapper2NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper2NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper2NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2))
@@ -650,14 +650,14 @@ template <class T1, class T2, class T3>
 class BehaviorFunctorWrapper3NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper3NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper3NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3))
@@ -676,14 +676,14 @@ public:
 template <class T1, class T2, class T3, class T4>
 class BehaviorFunctorWrapper4NO : public BehaviorFunctor
 {
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper4NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper4NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4))
@@ -703,14 +703,14 @@ template <class T1, class T2, class T3, class T4, class T5>
 class BehaviorFunctorWrapper5NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper5NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper5NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5))
@@ -730,14 +730,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6>
 class BehaviorFunctorWrapper6NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper6NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper6NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6))
@@ -757,14 +757,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 class BehaviorFunctorWrapper7NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper7NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper7NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7))
@@ -784,14 +784,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, 
 class BehaviorFunctorWrapper8NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper8NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper8NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8))
@@ -811,14 +811,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, 
 class BehaviorFunctorWrapper9NO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper9NO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper9NO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8; T9* t9;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8) && entity.canGetTrait<T9>(t9))
@@ -848,7 +848,7 @@ public:
     BehaviorFunctorWrapper1NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper1NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1;
         if (entity.canGetTrait<T1>(t1))
@@ -875,7 +875,7 @@ public:
     BehaviorFunctorWrapper2NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper2NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2))
@@ -902,7 +902,7 @@ public:
     BehaviorFunctorWrapper3NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper3NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3))
@@ -928,7 +928,7 @@ public:
     BehaviorFunctorWrapper4NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper4NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4))
@@ -955,7 +955,7 @@ public:
     BehaviorFunctorWrapper5NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper5NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5))
@@ -975,14 +975,14 @@ template <class T1, class T2, class T3, class T4, class T5, class T6>
 class BehaviorFunctorWrapper6NENO : public BehaviorFunctor
 {
 private:
-    typedef void (*FuncPtr) (const Entity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&);
+    typedef void (*FuncPtr) (const ReadOnlyEntity&, const T1&, const T2&, const T3&, const T4&, const T5&, const T6&);
     const FuncPtr function;
 
 public:
     BehaviorFunctorWrapper6NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper6NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6))
@@ -1009,7 +1009,7 @@ public:
     BehaviorFunctorWrapper7NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper7NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7))
@@ -1036,7 +1036,7 @@ public:
     BehaviorFunctorWrapper8NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper8NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8))
@@ -1063,7 +1063,7 @@ public:
     BehaviorFunctorWrapper9NENO (FuncPtr fptr) : function(fptr) {}
     ~BehaviorFunctorWrapper9NENO () {}
 
-    void operator() (Entity& entity) const
+    void operator() (const ReadOnlyEntity& entity) const
     {
         T1* t1; T2* t2; T3* t3; T4* t4; T5* t5; T6* t6; T7* t7; T8* t8; T9* t9;
         if (entity.canGetTrait<T1>(t1) && entity.canGetTrait<T2>(t2) && entity.canGetTrait<T3>(t3) && entity.canGetTrait<T4>(t4) && entity.canGetTrait<T5>(t5) && entity.canGetTrait<T6>(t6) && entity.canGetTrait<T7>(t7) && entity.canGetTrait<T8>(t8) && entity.canGetTrait<T9>(t9))

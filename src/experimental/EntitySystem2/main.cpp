@@ -2,6 +2,7 @@
 #include "HammerEntitySystem.h"
 #include "TraitBuilder.h"
 #include "BehaviorBuilder.h"
+#include "EventDispatcher.h"
 
 #include "Position.h"
 #include "Movement.h"
@@ -13,12 +14,16 @@
 #include "AlignedMemoryPool.h"
 #include <iostream>
 
+EventDispatcher* EventDispatcher::dispatcher = 0;
+
 #define debug std::cout << "On line " << __LINE__ << "\n";
 
 int main(int argc, char *argv[])
 {
     try {
         HammerEntitySystem hammerEngine;
+
+        EventDispatcher::implEventDispatcher(hammerEngine.getEventDispatcher());
 
         TraitBuilder traitBuilder(&hammerEngine);
         BehaviorBuilder behaviorBuilder(&hammerEngine);
@@ -31,8 +36,8 @@ int main(int argc, char *argv[])
         {
             Entity player = hammerEngine.createEntity()
                                 .addTrait<Position>()
-                                .addTrait<Movement>();
-//                                .addTrait<Observed>();
+                                .addTrait<Movement>()
+                                .addTrait<Observed>();
             PositionUtils::init(player.trait<Position>(), 0.0f, 0.0f, 1.0f);
             MovementUtils::init(player.trait<Movement>(), 0.0f, 1.0f, 0.0f);
             player.setState(Running);
@@ -41,7 +46,8 @@ int main(int argc, char *argv[])
         {
             Entity enemy = hammerEngine.createEntity()
                                 .addTrait<Position>()
-                                .addTrait<Movement>();
+                                .addTrait<Movement>()
+                                .addTrait<Collidable>();
 //                                .addTrait<Observed>();
             PositionUtils::init(enemy.trait<Position>(), 0.0f, 0.0f, 2.0f);
             MovementUtils::init(enemy.trait<Movement>(), 1.0f, 0.0f, 0.0f);
@@ -69,7 +75,7 @@ int main(int argc, char *argv[])
         }
 
         // Update the system a few times.
-        for (unsigned int i = 0; i < 240; ++i)
+        for (unsigned int i = 0; i < 5; ++i)
         {
             hammerEngine.updateBehavior();
         }

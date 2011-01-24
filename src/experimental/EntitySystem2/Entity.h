@@ -9,11 +9,83 @@
   */
 
 #include "EntitySystem.h"
+#include "ReadOnlyEntitySystem.h"
 #include "Trait.h"
 
 #include "DebugTools.h"
 
 #include <sstream>
+
+class ReadOnlyEntity
+{
+private:
+    const ReadOnlyEntitySystem& owner;
+
+public:
+    ReadOnlyEntity (const ReadOnlyEntitySystem& o, unsigned int ident) : owner(o), id(ident) {}
+    ReadOnlyEntity (const ReadOnlyEntity& other) : owner(other.owner), id(other.id) {}
+    virtual ~ReadOnlyEntity () {}
+
+    const unsigned int id;
+
+    // Convenience functions for accessing an entities traits
+
+    template <class T> inline const T& trait () const
+    {
+        AbstractTrait::Type t = owner.getTrait(id, Trait<T>::id());
+        if (t)
+        {
+            Trait<T>* tt = AbstractTrait::to_ptr<Trait<T> >(t);
+            assert_align(&(deref(tt)->data), 16);
+            return deref(tt)->data;
+        } else
+        {
+            std::ostringstream sstr;
+            sstr << "Entity " << (void*)id << " does not have trait " << typeid(T).name() << "!\n";
+            throw std::runtime_error(sstr.str());
+        }
+    }
+
+    template <class T> inline const T& getTraitUnsafe () const
+    {
+        Trait<T>* t = AbstractTrait::to_ptr<Trait<T> >(owner.getTrait(id, Trait<T>::id()));
+        assert_not_null(t);
+        assert_align(&(deref(t)->data), 16);
+        return deref(t)->data;
+    }
+
+    template <class T> inline bool hasTrait () const
+    {
+        return owner.getTrait(id, Trait<T>::id()) != 0;
+    }
+
+    template <class T> inline bool canGetTrait (T*& trait) const
+    {
+        AbstractTrait::Type t = owner.getTrait(id, Trait<T>::id());
+        if (t)
+        {
+            Trait<T>* tt = AbstractTrait::to_ptr<Trait<T> >(t);
+            assert_not_null(tt);
+            assert_align(&(deref(tt)->data), 16);
+            trait = &(deref(tt)->data);
+            return true;
+        }
+        return false;
+    }
+
+    inline const EntityState state ()
+    {
+        return owner.getState(id);
+    }
+
+    // Entity lookup
+
+    template <class T> static inline const Entity& fromTrait (T& trait, EntitySystem* es)
+    {
+        Trait<T> temp(trait);
+        return es->getEntityFromTrait(&temp);
+    }
+};
 
 class Entity
 {
@@ -87,17 +159,25 @@ public:
 
     inline void destroy ()
     {
-        owner.destroyEntity(*this);
+        owner.destroyEntity(id);
     }
+
+    // State management
 
     inline EntityState state ()
     {
-        return owner.getState(*this);
+        return owner.getState(id);
     }
 
     inline void setState (const EntityState& state)
     {
-        owner.setState(*this, state);
+        owner.setState(id, state);
+    }
+
+    // Read-only access
+    inline const ReadOnlyEntity readOnly () const
+    {
+        return owner.getReadOnlyEntity(id);
     }
 
     // Entity lookup

@@ -11,10 +11,10 @@
 #include <cassert>
 
 // Static (compile time) assertion
-//#define static_assert(pred) switch(0){case 0:case pred:;}
 template<int,typename MSG> struct static_assert_type { enum { Value}; typedef int Type;};
 template<typename MSG> struct static_assert_type <true,MSG> {};
 #define compiler_assert(pred) static_assert_type<pred, struct ERROR___Static_assertion_failure>
+#define compile_time_assert(pred) switch(0){case 0:case pred:;}
 
 #ifdef NDEBUG
 

@@ -5,10 +5,29 @@
 #include <tbb/parallel_for.h>
 
 #include "HammerEntitySystem.h"
+#include "HammerEventDispatcher.h"
 #include "TraitBuilder.h"
 #include "BehaviorFunctor.h"
 
 #include "DebugTools.h"
+
+class ReadOnlyHammerEntitySystem : public ReadOnlyEntitySystem
+{
+private:
+    const HammerEntitySystem& entitySystem;
+
+public:
+    ReadOnlyHammerEntitySystem (HammerEntitySystem& es)
+        : entitySystem(es)
+    {
+
+    }
+
+    const ReadOnlyEntity getEntityFromTrait (const AbstractTrait::Type trait) const {return entitySystem.getReadOnlyEntity(entitySystem.getEntityFromTrait(trait).id);}
+    const ReadOnlyEntity getEntity (unsigned int entity) const {return entitySystem.getReadOnlyEntity(entity);}
+    const EntityState getState (const unsigned int entity) const {return entitySystem.getState(entity);}
+    const AbstractTrait::Type getTrait (unsigned int entity, unsigned int trait) const {return entitySystem.getTrait(entity, trait);}
+};
 
 struct EntityConstructor
 {
@@ -21,6 +40,8 @@ struct EntityConstructor
 };
 
 HammerEntitySystem::HammerEntitySystem ()
+    : readOnlySystem(new ReadOnlyHammerEntitySystem(*this))
+    , eventDispatcher(new HammerEventDispatcher())
 {
     invalidEntity = new Entity(*this, (unsigned int)-1);
 }
@@ -32,6 +53,10 @@ HammerEntitySystem::~HammerEntitySystem ()
         entityPool.release(*iter);
     }
     // TODO: delete traits
+
+    // Delete read-only entity system
+    delete eventDispatcher;
+    delete const_cast<ReadOnlyEntitySystem*>(readOnlySystem);
 }
 
 // Entity API
@@ -45,9 +70,9 @@ Entity& HammerEntitySystem::createEntity ()
     return *deref(entity);
 }
 
-Entity& HammerEntitySystem::getEntityFromTrait  (const AbstractTrait::Type trait)
+Entity& HammerEntitySystem::getEntityFromTrait (const AbstractTrait::Type trait) const
 {
-    tbb::concurrent_unordered_map<const AbstractTrait::Type, Entity*>::iterator iter = traitToEntityMap.find(trait);
+    tbb::concurrent_unordered_map<const AbstractTrait::Type, Entity*>::const_iterator iter = traitToEntityMap.find(trait);
     if (iter != traitToEntityMap.end())
     {
         return *deref((deref_iter(iter, traitToEntityMap).second));
@@ -55,32 +80,37 @@ Entity& HammerEntitySystem::getEntityFromTrait  (const AbstractTrait::Type trait
     return *deref(invalidEntity);
 }
 
-Entity& HammerEntitySystem::getEntity (unsigned int entity)
+Entity& HammerEntitySystem::getEntity (const unsigned int entity) const
 {
     return (entity < entityList.size()) ? *deref(entityList[entity]) : *deref(invalidEntity);
 }
 
 // TODO: Queue until next behavior update
-void HammerEntitySystem::destroyEntity (const Entity& entity)
+void HammerEntitySystem::destroyEntity (const unsigned int entity)
 {
-    Entity* e = &getEntity(entity.id);
+    Entity* e = &getEntity(entity);
     if (e->valid)
     {
-        entityList[entity.id] = invalidEntity;
+        entityList[entity] = invalidEntity;
         // TODO: delete traits
         delete e;
     }
 }
 
-EntityState HammerEntitySystem::getState (const Entity& entity)
+EntityState HammerEntitySystem::getState (const unsigned int entity) const
 {
     return Running;
 }
 
 // TODO: Queue until next behavior update
-void HammerEntitySystem::setState (const Entity& entity, const EntityState& state)
+void HammerEntitySystem::setState (const unsigned int entity, const EntityState& state)
 {
 
+}
+
+const ReadOnlyEntity HammerEntitySystem::getReadOnlyEntity (const unsigned int entity) const
+{
+    return ReadOnlyEntity(*readOnlySystem, entity);
 }
 
 // Trait API
@@ -89,9 +119,9 @@ void HammerEntitySystem::registerTrait (unsigned int trait, TraitFactory* factor
     traitRegistrar[trait] = factory;
 }
 
-AbstractTrait::Type HammerEntitySystem::getTrait (unsigned int entity, unsigned int trait)
+AbstractTrait::Type HammerEntitySystem::getTrait (unsigned int entity, unsigned int trait) const
 {
-    tbb::concurrent_unordered_map<unsigned int, TraitFactory*>::iterator iter = traitRegistrar.find(trait);
+    tbb::concurrent_unordered_map<unsigned int, TraitFactory*>::const_iterator iter = traitRegistrar.find(trait);
     if (iter != traitRegistrar.end())
     {
         TraitFactory* factory = deref_iter(iter, traitRegistrar).second;
@@ -162,9 +192,9 @@ public:
         for(std::size_t i = r.begin(); i != r.end(); ++i)
         {
             // Get the entity
-            Entity* entity = &engine.getEntity(entities[i]);
+            const ReadOnlyEntity& entity = engine.getReadOnlyEntity(entities[i]);
             // Process current entity
-            (*behavior)(*deref(entity));
+            (*behavior)(entity);
         }
     }
 };
@@ -255,20 +285,25 @@ void HammerEntitySystem::updateBehavior ()
 
                 // Iterate through the entities
                 std::vector<unsigned int>::iterator it = entities.begin();
-                Entity* entity = 0;
 
                 // Process each entity
                 // PARALLEL
                 for (; it != entities.end(); ++it)
                 {
                     // Get the entity
-                    entity = &getEntity(deref_iter(it, entities));
+                    const ReadOnlyEntity& entity = getReadOnlyEntity(deref_iter(it, entities));
                     // Process current entity
-                    (*(deref_iter(behavior_iter, behaviors).second))(*deref(entity));
+                    (*(deref_iter(behavior_iter, behaviors).second))(entity);
                 }
             }
         }
     }
 #endif
+
+    eventDispatcher->disposeEvents();
 }
 
+EventDispatcher* HammerEntitySystem::getEventDispatcher ()
+{
+    return eventDispatcher;
+}

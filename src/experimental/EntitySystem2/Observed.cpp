@@ -6,7 +6,7 @@
 #include "Position.h"
 #include "Movement.h"
 
-void do_observe (const Entity& entity, const Observed& observed, const Movement& movement, const Position& position)
+void do_observe (const ReadOnlyEntity& entity, const Observed& observed, const Movement& movement, const Position& position)
 {
     std::cout << "Observing "
               << entity.id
